@@ -42,31 +42,32 @@
   html.snap{ scroll-snap-type:y mandatory; }
   #flow{ position:relative; }
   .screen{
-    min-height:calc(100dvh - var(--reserved, 120px));
+    min-height:100dvh;
     scroll-snap-align:start; scroll-snap-stop:always;
-    display:flex; align-items:center;
-    position:relative; padding-left:34px; margin-left:-34px;
+    position:relative; margin-left:-34px;
+    padding:26px 0 var(--reserved, 120px) 34px;
   }
   .screen p{ margin:0; text-wrap:pretty; }
   .col{ width:100%; }
-  /* the tail of the previous paragraph shows above, faint: where you came from.
-     On switching branch it is the same parent with a different continuation. */
+  /* The tail of the previous paragraph rises and parks at the top, faint: where
+     you came from. It is sticky, so the new paragraph slides underneath it
+     instead of pushing it along. Cut by whole fragments, never by height: a
+     sentence that starts mid-way cannot be read, and half a fragment is half
+     of someone's hand. */
   .before{
-    max-height:calc(var(--lh) * 2); overflow:hidden;
-    display:flex; align-items:flex-end;
-    margin-bottom:var(--lh); opacity:.4;
+    position:sticky; top:26px; z-index:2;
+    background:var(--paper); padding-bottom:var(--lh);
+    opacity:.4;
   }
-  /* On arrival: the paragraph you just read drifts up a little further, brakes
-     and dims at the top, while the new one brightens to be read. */
-  @keyframes settle{
-    from{ opacity:.82; transform:translateY(9px); }
-    to{ opacity:.4; transform:none; }
-  }
+  /* The same text must never be on screen twice. Once a paragraph stops being
+     the current one, the tail that the next screen already parked fades out. */
+  .dup{ transition:opacity .22s ease; }
+  .screen:not(.current) .dup{ opacity:0; }
+  /* On arrival the new paragraph brightens to be read. */
   @keyframes brighten{
     from{ opacity:.5; }
     to{ opacity:1; }
   }
-  .screen.current .before{ animation:settle .42s cubic-bezier(.16,.84,.44,1); }
   .screen.current > .col > p{ animation:brighten .5s ease; }
   .f{ transition:background-color 1s ease; border-radius:2px; }
   .f.fresh{ background-color:var(--fresh); }
@@ -89,34 +90,38 @@
     font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
     letter-spacing:.08em; text-transform:uppercase;
   }
-  /* the mark only says that this moment has another version */
-  .screen.fork::before{
-    content:"*"; position:absolute; left:0; top:50%; margin-top:-16px;
+  /* the mark only says that this moment has another version. It sits beside the
+     paragraph, not the screen, so it stays put now that screens are top-aligned */
+  .screen.fork > .col > p{ position:relative; }
+  .screen.fork > .col > p::before{
+    content:"*"; position:absolute; left:-34px; top:0;
     width:22px; text-align:right; color:var(--ink-faint);
     font-size:13px; line-height:var(--lh); transition:color .3s;
   }
-  .screen.fork.current::before{ color:var(--accent); }
+  .screen.fork.current > .col > p::before{ color:var(--accent); }
   .screen.alt > .col > p{ color:var(--ink-soft); }
   .ending{ color:var(--ink-faint); }
   .end{ display:block; margin-bottom:16px; }
-  #bAnother{
+  .acts{ display:flex; gap:24px; flex-wrap:wrap; }
+  .acts button{
     background:none; border:0; padding:0; cursor:pointer; color:var(--accent);
     font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
     letter-spacing:.08em; text-transform:uppercase;
   }
+  .acts button:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
 
   /* ---------- index ---------- */
   .item{ border-top:1px solid var(--rule); padding:22px 0; cursor:pointer; }
   .item:last-child{ border-bottom:1px solid var(--rule); }
   .item:hover .opens{ color:var(--accent); }
-  .item .meta{ color:var(--ink-faint); display:block; margin-top:8px; }
+  .meta{ color:var(--ink-faint); display:block; margin-top:8px; }
 
   /* ---------- bar ---------- */
   .bar{
     display:flex; align-items:center; justify-content:space-between; gap:14px 20px;
     flex-wrap:wrap; padding:18px 24px calc(22px + env(safe-area-inset-bottom));
     color:var(--ink-faint);
-    position:sticky; bottom:0; background:var(--paper);
+    position:sticky; bottom:0; z-index:5; background:var(--paper);
   }
   .grp{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
   .bar button{
@@ -136,6 +141,8 @@
   .leafrow:last-of-type{ border-bottom:1px solid var(--rule); }
   .leafrow .parent{ color:var(--ink-faint); }
   .leafrow:hover .leaf, .leafrow.sel .leaf{ color:var(--accent); }
+  .leafrow.taken{ cursor:default; opacity:.45; }
+  .leafrow.taken:hover .leaf{ color:inherit; }
   #editor{ margin-top:26px; display:none; }
   #editor.open{ display:block; }
   textarea{
@@ -212,73 +219,73 @@
         {a:"dana",t:"A question."},
         {a:"jonas",t:"What if the train does carry someone, and we are the ones who stopped being seen?"},
         {a:"olga",t:"He shut the notebook before he could regret it."},
-        {a:"sara",t:"Outside, the snow was falling without ever reaching the ground.",p:1},
+        {a:"sara",t:"Outside, the snow was falling without ever reaching the ground."},
         {a:"ruy",t:"A dog crossed the tracks in the opposite direction from usual."},
         {a:"tavo",t:"He followed it, having nothing better to do with the insomnia."},
         {a:"lia",t:"The dog stopped at a door he could not remember ever having seen."},
         {a:"martin",t:"It was the door of his own house."},
-        {a:"martin",t:"But on the wrong side of the street."},
-        {a:"isis",t:"Inside, someone had left the light on and the table set for two.",p:1},
+        {a:"cielo",t:"But on the wrong side of the street."},
+        {a:"isis",t:"Inside, someone had left the light on and the table set for two."},
         {a:"nube",t:"He had been eating dinner alone for twenty years."},
         {a:"bruno",t:"He sat down anyway, on the side that was not his."},
         {a:"cielo",t:"The soup was warm, as if someone had just left through the other door."},
         {a:"ana",t:"There was no other door."},
-        {a:"kai",t:"In the notebook the question was still open, and open questions have weight.",p:1},
+        {a:"kai",t:"In the notebook the question was still open, and open questions have weight."},
         {a:"dana",t:"He decided to answer it with his feet."},
         {a:"jonas",t:"He walked back to the station over his own footprints, which were gone."},
         {a:"olga",t:"The platform was full."},
         {a:"mireia",t:"People in coats, holding tickets, watching a clock he had never installed."},
         {a:"sara",t:"Not one of them made a sound."},
         {a:"ruy",t:"He knew every one of them: they were the hours he had recorded for eleven years."},
-        {a:"tavo",t:"A woman came over and handed back the notebook he was already holding.",p:1},
+        {a:"tavo",t:"A woman came over and handed back the notebook he was already holding."},
         {a:"lia",t:"“We have been reading it,” she said. “It is the only thing that arrives on time.”"},
         {a:"martin",t:"He wanted to ask who they were."},
         {a:"isis",t:"He asked something else."},
         {a:"nube",t:"“What if I get on?”"},
         {a:"cielo",t:"Nobody answered, but every one of them stepped aside."},
-        {a:"ana",t:"The train came in empty, as always, and for the first time it looked like an invitation.",p:1},
+        {a:"ana",t:"The train came in empty, as always, and for the first time it looked like an invitation."},
         {a:"bruno",t:"He boarded with the notebook under his arm, leaving the station light on."},
         {a:"kai",t:"The doors closed with the sound of a page being turned."},
         {a:"dana",t:"Through the window he saw the stationmaster writing down the exact time."},
-        {a:"dana",t:"He raised a hand to greet himself."},
-        {a:"jonas",t:"The carriage smelled of wet paper and of winters that had not been his.",p:1},
+        {a:"kai",t:"He raised a hand to greet himself."},
+        {a:"jonas",t:"The carriage smelled of wet paper and of winters that had not been his."},
         {a:"olga",t:"On every seat lay a different notebook, open at a question."},
         {a:"mireia",t:"None of them was his."},
         {a:"sara",t:"He understood that it was his turn to answer one."},
         {a:"ruy",t:"He chose the shortest, because the train was not going to wait."},
-        {a:"tavo",t:"It read: “Who turns on the light in empty houses?”",p:1},
+        {a:"tavo",t:"It read: “Who turns on the light in empty houses?”"},
         {a:"lia",t:"Underneath, in his shrunken hand, he wrote: “Someone on their way.”"},
         {a:"martin",t:"The train braked where there was no station."},
         {a:"isis",t:"Outside there was no snow: there was November, and a street with two identical sidewalks."},
         {a:"nube",t:"He got off."},
-        {a:"cielo",t:"The house had the table set for two and the soup still warm.",p:1},
+        {a:"cielo",t:"The house had the table set for two and the soup still warm."},
         {a:"ana",t:"This time he sat on his own side."},
         {a:"bruno",t:"He left the notebook open at the page that came next."},
         {a:"kai",t:"And he waited, in no hurry, for someone else to arrive late."}
       ],
       forks:{
-        7:{ branch:[
+        5:{ branch:[
           {a:"ruy",t:"The notebook stayed open all night, and the snow came in to read it."},
           {a:"dana",t:"By morning the ink had run until it formed a different question."},
           {a:"olga",t:"Nobody ever read it, because the stationmaster never came back."}
         ]},
-        14:{ branch:[
+        15:{ branch:[
           {a:"cielo",t:"But he was no longer sure which side was his."},
           {a:"kai",t:"He knocked, just in case, and a man with his same tired face opened it."},
           {a:"sara",t:"Both understood at the same moment that one of them was one too many."},
           {a:"nube",t:"Neither of them moved."}
         ]},
-        22:{ branch:[
+        20:{ branch:[
           {a:"nube",t:"The snow had erased the entire station and even so the clock kept going."},
           {a:"martin",t:"He wrote the time in the air with a finger, because there was no notebook left."},
           {a:"lia",t:"It was the first time in eleven years that he was on time."}
         ]},
-        31:{ branch:[
+        30:{ branch:[
           {a:"sara",t:"“Nobody gets on,” said the woman. “You stay until the train takes you.”"},
           {a:"jonas",t:"He looked at the crowded platform and counted: eleven years, eleven winters."},
           {a:"isis",t:"He stayed, and went on recording, no longer alone."}
         ]},
-        41:{ branch:[
+        40:{ branch:[
           {a:"isis",t:"He answered none of them: he wrote a new one and left it open for the next."},
           {a:"bruno",t:"The whole carriage turned the page at the same time."},
           {a:"ana",t:"And the train went on, with no destination now, collecting questions."}
@@ -336,22 +343,25 @@
     return n.weight;
   }
 
-  function build(h){
-    var cuts = {};
-    h.route.forEach(function(fr, i){ if(fr.p) cuts[i] = 1; });
-    Object.keys(h.forks).forEach(function(k){ cuts[k] = 1; });
+  /* Every paragraph is five lines by five different hands. Nobody decides where
+     one breaks: the count does. Continuing joins the last paragraph while there
+     is room, and opens a new one when it is full. A fork no longer cuts a
+     paragraph short — how a fork opens is still to be designed. */
+  var LINES = 5;
 
+  function build(h){
     var paras = [], current = null;
     h.route.forEach(function(fr, i){
-      if(!current || cuts[i]){ current = node([], i); paras.push(current); }
+      if(i % LINES === 0){ current = node([], i); paras.push(current); }
       current.frs.push(fr);
     });
     for(var j = 0; j < paras.length - 1; j++) paras[j].kids.push(paras[j + 1]);
 
+    /* A fork opens at a paragraph boundary, so its branch is a whole alternate
+       paragraph: swiping swaps five lines for five others, not half of each. */
     Object.keys(h.forks).forEach(function(k){
-      var j = -1;
-      paras.forEach(function(p, x){ if(p.from === parseInt(k, 10)) j = x; });
-      if(j > 0) paras[j - 1].kids.push(node(h.forks[k].branch.slice(), -1));
+      var j = parseInt(k, 10) / LINES;
+      if(j > 0 && j === Math.floor(j)) paras[j - 1].kids.push(node(h.forks[k].branch.slice(), -1));
     });
 
     weigh(paras[0]);
@@ -380,6 +390,18 @@
       });
     });
     return hands;
+  }
+
+  /* Lines already in the story's last paragraph. Five means it is closed. */
+  function openLines(h){ return h.route.length % LINES || LINES; }
+
+  /* Five different hands: nobody writes twice in the same paragraph. */
+  function alreadyYours(h){
+    var filled = openLines(h);
+    if(filled === LINES) return false;          // closed, so yours opens a new one
+    return h.route.slice(h.route.length - filled).some(function(fr){
+      return fr.a === "you";
+    });
   }
 
   function tree(){
@@ -413,11 +435,14 @@
   /* ---------- reading: one screen per paragraph ---------- */
 
   function paraHTML(p, echo){
-    var s = "<p>";
+    /* The fragments the next screen will park at its top are marked: they are
+       the same text, so only one of the two copies may ever be visible. */
+    var s = "<p>", parked = echo ? [] : tail(p).frs;
     p.frs.forEach(function(fr, x){
       var tinte = TINTS[fr.a] || "0,0%";
       s += (x ? " " : "")
         + '<span class="f' + (!echo && fr === state.fresh ? " fresh" : "")
+        + (parked.indexOf(fr) >= 0 ? " dup" : "")
         + '" data-a="' + fr.a + '"'
         + ' style="--tint:hsla(' + tinte + ',55%,.13);--tint2:hsla(' + tinte + ',55%,.34)">'
         + fr.t + "</span>";
@@ -425,7 +450,16 @@
     return s + "</p>";
   }
 
-  function echo(p){ return '<div class="before">' + paraHTML(p, true) + "</div>"; }
+  /* The echo always begins at a fragment boundary, so it reads as a whole
+     sentence. One fragment is usually enough; if the last one is very short
+     ("A question.") the one before it comes along for context. */
+  function tail(p){
+    var frs = p.frs, from = frs.length - 1;
+    if(from > 0 && frs[from].t.length < 45) from -= 1;
+    return { frs: frs.slice(from) };
+  }
+
+  function echo(p){ return '<div class="before">' + paraHTML(tail(p), true) + "</div>"; }
 
   function render(){
     var route = currentRoute(), html = "";
@@ -439,10 +473,18 @@
     html += '<div class="screen ending"><div class="col">'
       + echo(route[route.length - 1])
       + '<span class="mono end">The story stopped here</span>'
-      + '<button id="bAnother" class="mono">Another story</button></div></div>';
+      + '<span class="acts"><button id="bGoOn">Continue it</button>'
+      + '<button id="bAnother">Another story</button></span></div></div>';
     flow.innerHTML = html;
     if(typeof hand !== "undefined") hand.classList.remove("open");
     $("#bAnother").addEventListener("click", function(){ mode("index"); });
+    /* You reached the end, so you can carry it on: the turn opens on this story. */
+    $("#bGoOn").addEventListener("click", function(){
+      var cual = state.story;
+      mode("turn");
+      var fila = $('.leafrow[data-h="' + cual + '"]');
+      if(fila) fila.click();
+    });
     measure();
     markCurrent();
   }
@@ -626,13 +668,19 @@
       return;
     }
     cont.innerHTML = STORIES.map(function(h, i){
-      var n = h.route.length;
+      var n = h.route.length, llenas = openLines(h);
       var parent = n > 1 ? h.route[n-2].t : "";
-      return '<div class="leafrow" tabindex="0" data-h="' + i + '">'
+      var tuya = alreadyYours(h);
+      var estado = tuya ? "your line is already in this paragraph"
+        : llenas === LINES ? "opens a new paragraph"
+        : "line " + (llenas + 1) + " of " + LINES;
+      return '<div class="leafrow' + (tuya ? " taken" : "") + '" tabindex="0" data-h="' + i + '">'
         + (parent ? '<span class="parent">' + parent + "</span> " : "")
-        + '<span class="leaf">' + h.route[n-1].t + "</span></div>";
+        + '<span class="leaf">' + h.route[n-1].t + "</span>"
+        + '<span class="meta mono">' + estado + "</span></div>";
     }).join("");
     Array.prototype.forEach.call(cont.querySelectorAll(".leafrow"), function(el){
+      if(el.classList.contains("taken")) return;
       el.addEventListener("click", function(){
         Array.prototype.forEach.call(cont.querySelectorAll(".leafrow"), function(x){ x.classList.remove("sel"); });
         el.classList.add("sel");
@@ -653,7 +701,7 @@
   $("#send").addEventListener("click", function(){
     var t = $("#text").value.trim();
     var h = STORIES[state.pickedLeaf];
-    var fr = { a:"you", t:t, p:(h.route.length % 5 === 0 ? 1 : 0) };
+    var fr = { a:"you", t:t };
     h.route.push(fr);
     h.tree = null;                       // the tree is rebuilt with the new fragment
     hands = null;                         // and the census of hands is recounted

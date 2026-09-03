@@ -19,7 +19,8 @@ Formal reference: the Japanese **renga**. Master rule of *link and shift*: each 
 
 | Primitive | Definition |
 |---|---|
-| **Fragment** | The only publishable unit. ~100 characters. Every fragment has exactly one parent. |
+| **Fragment** | The only publishable unit, also called a line. ~100 characters. Every fragment has exactly one parent. |
+| **Paragraph** | Exactly five lines by five different hands. Not published by anyone: it closes on the count. |
 | **Seed** | A fragment with no parent. Scarce by design. |
 | **Fork** | A fragment with more than one child: that is where the story branches. |
 | **Route** | A sequence root → leaf. It is what reads as one continuous text. |
@@ -107,11 +108,11 @@ It shows **leaves** — open endings waiting for a continuation. Few (3–5) at 
 1. **Zero chrome repeated per unit.** No cards, borders, avatars, timestamps, counters or bubbles.
 2. **Book composition.** Single column, 60–70 characters per line, generous leading, real margins.
 3. **The seam is a space, not a line.** The boundary between fragments does not coincide with any visual boundary.
-4. **The paragraph is emergent, not published.** It closes every N fragments or on reaching a fork.
+4. **The paragraph is emergent, not published.** Exactly five lines, by five different hands. Nobody decides where one breaks: the count does. Continuing joins the last paragraph while there is room and opens a new one when it is full, and nobody may write twice inside the same paragraph — five lines are always five people.
 5. **Two axes.** Vertical is the time of the story: **one paragraph per screen**, from beginning to end. Horizontal is the other versions of that same moment. What is forbidden is *infinite* scrolling —the feed that never closes—, not scrolling: a route is finite and it ends. *(Revised 03-sep-2026. The previous version paginated and the gesture was tapping to turn the page; on a phone nobody finds it, because the learned gesture for reading a long text is swiping.)*
 6. **Versions are ordered left to right and the canon is the leftmost one.** There is a single gesture, right to left, and it always advances; past the last one you come back to the canon. A single direction makes the axis learnable without explaining it: there is no need to discover that you can also go back.
 7. **The tail of the previous paragraph shows above**, faint and clipped to two lines. It gives continuity while reading and makes the fork legible: on switching version the one above does not change, so you can see that both continuations come out of the same parent. As each screen arrives, that paragraph brakes and dims while the new one brightens.
-8. **A fork always lands on a paragraph break**, never mid-sentence. The structure of the text and the structure of the tree are the same thing. A discreet marginal mark says this moment has another version: book apparatus, not a button.
+8. **A fork does not cut a paragraph short.** It used to, so that the fork would coincide with a paragraph break; but a paragraph is now always five lines, and that takes precedence. *(Revised 04-sep-2026. How a fork opens is still to be designed — see §8.)* A discreet marginal mark says this moment has another version: book apparatus, not a button.
 9. **Authorship is off by default.** An *authorship* mode tints every fragment by hand: first you read a text, then you watch it break into 200 hands. Tapping a fragment deepens its tone and gives the name of that hand **below, in the apparatus** — not in the margin, which does not exist on a phone, and not floating over the text, which would cover the neighbouring lines.
 
 ### Two objects, two languages
