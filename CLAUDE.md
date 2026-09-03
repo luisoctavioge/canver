@@ -67,6 +67,7 @@ CLAUDE.md               this file
 README.md               short presentation
 docs/01-references.md   map of references and what to learn from each
 docs/02-system-v0.md    the whole system: primitives, economy, visual layer
+docs/03-open-threads.md what is still being thought through, nothing decided
 prototype/index.html    static prototype, one file, no dependencies
 DIAGRAM 1.png           the reading model as it stands
 DIAGRAM 2.png           stories chained in one stream, still to be designed
@@ -108,3 +109,4 @@ DIAGRAM 2.png           stories chained in one stream, still to be designed
 - **Before building**, read `docs/02-system-v0.md`. `docs/01-references.md` explains why each decision is the way it is, and what killed the predecessors (Ficlets, Ficly, FoldingStory, Branch): none of them died of the concept, all of them died of infrastructure and maintenance.
 - **The prototype is edited in its own file**, not rewritten from scratch.
 - When a decision changes, update this file and `docs/02-system-v0.md` in the same commit.
+- What is not decided yet lives in `docs/03-open-threads.md`. When something there gets decided it moves into `02` and leaves that file.

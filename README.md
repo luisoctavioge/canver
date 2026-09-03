@@ -9,6 +9,7 @@ You can only write by answering someone else's fragment. The threads read as one
 - [`CLAUDE.md`](CLAUDE.md) — **start here.** The whole context of the project in a single document.
 - [`docs/01-references.md`](docs/01-references.md) — map of references and what to learn from each one.
 - [`docs/02-system-v0.md`](docs/02-system-v0.md) — the system: primitives, turn economy, resolving the tree, visual layer.
+- [`docs/03-open-threads.md`](docs/03-open-threads.md) — open threads: what is still being thought through.
 
 ## Prototype
 
