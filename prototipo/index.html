@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Canver</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,76 +16,82 @@
     --ink-faint: #a9a298;
     --rule: #e2ddd2;
     --accent: #8a7a5e;
+    --marca: rgba(180,150,80,.28);
     --measure: 34em;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --paper:#12120f; --ink:#e9e4d9; --ink-soft:#8e887c; --ink-faint:#5b564d; --rule:#2a2823; --accent:#b3a179; }
+    :root{ --paper:#12120f; --ink:#e9e4d9; --ink-soft:#8e887c; --ink-faint:#5b564d; --rule:#2a2823; --accent:#b3a179; --marca:rgba(179,161,121,.22); }
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; background:var(--paper); color:var(--ink); }
+  html{ -webkit-text-size-adjust:100%; }
+  html,body{ margin:0; padding:0; background:var(--paper); color:var(--ink); overscroll-behavior:none; }
   body{
     font-family:"Newsreader", Georgia, "Iowan Old Style", serif;
-    font-size:19px; line-height:var(--lh);
-    font-weight:350;
+    font-size:19px; line-height:var(--lh); font-weight:350;
     -webkit-font-smoothing:antialiased;
-    display:flex; flex-direction:column; min-height:100vh;
+    display:flex; flex-direction:column; min-height:100vh; min-height:100dvh;
   }
   .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
 
-  /* ---------- estructura ---------- */
-  main{ flex:1; display:flex; align-items:center; justify-content:center; padding:0 24px; }
+  main{ flex:1; display:flex; align-items:center; justify-content:center; padding:24px 24px 0; }
   .wrap{ width:100%; max-width:var(--measure); }
 
-  /* ---------- modo lectura ---------- */
+  /* ---------- lectura ---------- */
   #lectura .page{ overflow:hidden; position:relative; padding-left:34px; margin-left:-34px; }
   #flow{ position:relative; transition:transform .35s cubic-bezier(.4,0,.2,1); }
-  #flow p{ margin:0; text-wrap:pretty; hyphens:auto; }
+  #flow p{ margin:0; text-wrap:pretty; }
   #flow p + p{ margin-top:var(--lh); }
-  .f{ transition:background-color .8s ease; border-radius:2px; }
-  .f.nuevo{ background-color:rgba(180,150,80,.28); }
-  /* modo autoría */
-  #flow.autoria .f{ background-color:var(--tint); box-shadow:0 0 0 1px transparent; }
+  .f{ transition:background-color 1s ease; border-radius:2px; }
+  .f.nuevo{ background-color:var(--marca); }
+  #flow.autoria .f{ background-color:var(--tint); }
+  .alt{ color:var(--ink-soft); }
+  .fin{ color:var(--ink-faint); margin-top:var(--lh); display:block; }
   .marca{
     position:absolute; left:-34px; width:22px; text-align:right;
-    color:var(--ink-faint); cursor:pointer; font-size:12px; line-height:var(--lh);
+    color:var(--ink-faint); cursor:pointer; font-size:13px; line-height:var(--lh);
     user-select:none; transition:color .2s;
   }
   .marca:hover{ color:var(--accent); }
 
+  /* ---------- índice ---------- */
+  .item{ border-top:1px solid var(--rule); padding:22px 0; cursor:pointer; }
+  .item:last-child{ border-bottom:1px solid var(--rule); }
+  .item:hover .abre{ color:var(--accent); }
+  .item .meta{ color:var(--ink-faint); display:block; margin-top:8px; }
+
   /* ---------- barra ---------- */
   .bar{
-    display:flex; align-items:center; justify-content:space-between; gap:18px;
-    padding:16px 24px 22px; color:var(--ink-faint);
+    display:flex; align-items:center; justify-content:space-between; gap:14px 20px;
+    flex-wrap:wrap; padding:18px 24px calc(22px + env(safe-area-inset-bottom));
+    color:var(--ink-faint);
   }
-  .bar .grp{ display:flex; gap:18px; align-items:center; }
+  .grp{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
   .bar button{
     background:none; border:0; padding:0; cursor:pointer; color:var(--ink-faint);
-    font-family:"IBM Plex Mono", monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
-    transition:color .2s;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase; transition:color .2s;
   }
   .bar button:hover{ color:var(--ink); }
   .bar button.on{ color:var(--accent); }
-  .marcaAviso{ color:var(--ink-faint); }
+  .bar button:focus-visible, .item:focus-visible, .hoja:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
 
-  /* ---------- rama alterna ---------- */
+  /* ---------- rama ---------- */
   #rama{
     position:fixed; inset:auto 0 0 0; background:var(--paper);
-    border-top:1px solid var(--rule); padding:26px 24px 30px;
+    border-top:1px solid var(--rule); padding:26px 24px calc(30px + env(safe-area-inset-bottom));
     transform:translateY(102%); transition:transform .3s cubic-bezier(.4,0,.2,1);
   }
   #rama.abierta{ transform:none; }
   #rama .inner{ max-width:var(--measure); margin:0 auto; }
-  #rama .et{ color:var(--ink-faint); margin-bottom:10px; display:block; }
-  #rama .alt{ color:var(--ink-soft); font-style:italic; }
+  .et{ color:var(--ink-faint); display:block; margin-bottom:12px; }
+  #ramaTexto{ margin:0; color:var(--ink-soft); font-style:italic; }
 
-  /* ---------- modo turno ---------- */
-  #turno .et{ color:var(--ink-faint); display:block; margin-bottom:26px; }
+  /* ---------- turno ---------- */
+  #turno .et{ margin-bottom:24px; }
   .hoja{ border-top:1px solid var(--rule); padding:20px 0; cursor:pointer; }
   .hoja:last-of-type{ border-bottom:1px solid var(--rule); }
   .hoja .padre{ color:var(--ink-faint); }
-  .hoja .leaf{ color:var(--ink); }
-  .hoja:hover .leaf{ color:var(--accent); }
-  .hoja.sel .leaf{ color:var(--accent); }
+  .hoja:hover .leaf, .hoja.sel .leaf{ color:var(--accent); }
   #editor{ margin-top:26px; display:none; }
   #editor.abierto{ display:block; }
   textarea{
@@ -94,11 +100,12 @@
     padding:0 0 10px; outline:none; height:calc(var(--lh)*2);
   }
   textarea::placeholder{ color:var(--ink-faint); }
-  .conta{ display:flex; justify-content:space-between; margin-top:12px; color:var(--ink-faint); }
+  .conta{ display:flex; justify-content:space-between; margin-top:14px; color:var(--ink-faint); }
   .conta.excedido{ color:#b4553f; }
   #enviar{ color:var(--accent); }
   #enviar[disabled]{ color:var(--ink-faint); cursor:default; }
-  .vacio{ color:var(--ink-faint); font-style:italic; }
+  .vacio{ color:var(--ink-faint); font-style:italic; margin:0; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
 </style>
 </head>
 <body>
@@ -108,6 +115,11 @@
 
     <section id="lectura">
       <div class="page" id="page"><div id="flow"></div></div>
+    </section>
+
+    <section id="indice" hidden>
+      <span class="mono et">Historias abiertas</span>
+      <div id="listaIndice"></div>
     </section>
 
     <section id="turno" hidden>
@@ -125,10 +137,12 @@
 <div class="bar mono">
   <div class="grp">
     <button id="bLeer" class="on">Leer</button>
+    <button id="bIndice">Índice</button>
     <button id="bTurno">Continuar</button>
-    <button id="bAutoria">Autoría</button>
   </div>
   <div class="grp">
+    <button id="bAutoria">Autoría</button>
+    <button id="bDeriva">Deriva</button>
     <span id="pagina"></span>
     <span id="turnos"></span>
   </div>
@@ -136,7 +150,7 @@
 
 <div id="rama"><div class="inner">
   <span class="mono et">Aquí la historia también hizo esto</span>
-  <p class="alt" id="ramaTexto"></p>
+  <p id="ramaTexto"></p>
 </div></div>
 
 <script>
@@ -199,11 +213,32 @@
         {a:"kai",t:"Y esperó, sin apuro, a que alguien más llegara tarde."}
       ],
       nudos:{
-        7:{a:"ruy",t:"El cuaderno se quedó abierto toda la noche, y la nieve entró a leerlo."},
-        14:{a:"cielo",t:"Pero él ya no estaba seguro de cuál lado era el suyo."},
-        22:{a:"nube",t:"La nieve había borrado la estación entera y, aun así, el reloj seguía."},
-        31:{a:"sara",t:"«Nadie se sube», dijo la mujer. «Uno se queda hasta que el tren se lo lleva»."},
-        41:{a:"isis",t:"No contestó ninguna: escribió una nueva y la dejó abierta para el siguiente."}
+        7:{ rama:[
+          {a:"ruy",t:"El cuaderno se quedó abierto toda la noche, y la nieve entró a leerlo."},
+          {a:"dana",t:"Por la mañana la tinta se había corrido hasta formar otra pregunta."},
+          {a:"olga",t:"Nadie la leyó nunca, porque el jefe no volvió a la estación."}
+        ]},
+        14:{ rama:[
+          {a:"cielo",t:"Pero él ya no estaba seguro de cuál lado era el suyo."},
+          {a:"kai",t:"Tocó, por si acaso, y le abrió un hombre con su misma cara cansada."},
+          {a:"sara",t:"Los dos entendieron al mismo tiempo que sobraba uno."},
+          {a:"nube",t:"Ninguno se movió."}
+        ]},
+        22:{ rama:[
+          {a:"nube",t:"La nieve había borrado la estación entera y, aun así, el reloj seguía."},
+          {a:"martin",t:"Anotó la hora en el aire, con el dedo, porque ya no había cuaderno."},
+          {a:"lia",t:"Fue la primera vez en once años que llegó a tiempo."}
+        ]},
+        31:{ rama:[
+          {a:"sara",t:"«Nadie se sube», dijo la mujer. «Uno se queda hasta que el tren se lo lleva»."},
+          {a:"jonas",t:"Él miró el andén lleno y contó: once años, once inviernos, once trenes."},
+          {a:"isis",t:"Se quedó, y siguió anotando, ahora acompañado."}
+        ]},
+        41:{ rama:[
+          {a:"isis",t:"No contestó ninguna: escribió una nueva y la dejó abierta para el siguiente."},
+          {a:"bruno",t:"El vagón entero pasó la página al mismo tiempo."},
+          {a:"ana",t:"Y el tren siguió, ya sin destino, recogiendo preguntas."}
+        ]}
       }
     },
     { id:"biblioteca",
@@ -225,34 +260,51 @@
 
   var TINTES = {ana:"18,90%",bruno:"48,70%",mireia:"160,55%",kai:"280,45%",dana:"5,75%",jonas:"210,60%",olga:"95,55%",sara:"330,55%",ruy:"35,80%",tavo:"250,50%",lia:"185,60%",martin:"60,70%",isis:"300,50%",nube:"200,50%",cielo:"140,50%",tu:"25,95%"};
 
-  var estado = { historia:0, pagina:0, autoria:false, turnos:3, hojaSel:null, nuevo:null };
+  var estado = { historia:0, pagina:0, autoria:false, deriva:false, rolls:{}, turnos:3, hojaSel:null, nuevo:null };
 
   var $ = function(s){ return document.querySelector(s); };
-  var page=$("#page"), flow=$("#flow"), rama=$("#rama"), ramaTexto=$("#ramaTexto");
+  var page=$("#page"), flow=$("#flow"), rama=$("#rama");
 
   function altoPagina(){
-    var lh = 32;
-    var libres = window.innerHeight - 150;
-    var lineas = Math.max(8, Math.floor(libres / lh));
-    return lineas * lh;
+    var libres = window.innerHeight - 170;
+    return Math.max(8, Math.floor(libres / 32)) * 32;
+  }
+
+  function tirarDados(){
+    var h = HISTORIAS[estado.historia];
+    estado.rolls = {};
+    Object.keys(h.nudos).forEach(function(k){ estado.rolls[k] = Math.random() < 0.2; });
+  }
+
+  function secuencia(){
+    var h = HISTORIAS[estado.historia], items = [], cortada = false;
+    for(var i = 0; i < h.ruta.length; i++){
+      items.push({ fr:h.ruta[i], i:i, nudo:h.nudos[i+1] ? i+1 : null });
+      if(estado.deriva && h.nudos[i+1] && estado.rolls[i+1]){
+        h.nudos[i+1].rama.forEach(function(fr, k){ items.push({ fr:fr, alt:true, p:k === 0 }); });
+        cortada = true;
+        break;
+      }
+    }
+    return { items:items, cortada:cortada };
   }
 
   function render(){
-    var h = HISTORIAS[estado.historia];
-    var html = "", abierto = false;
-    h.ruta.forEach(function(fr, i){
-      if(i === 0 || fr.p){ if(abierto) html += "</p>"; html += "<p>"; abierto = true; }
+    var s = secuencia(), html = "", abierto = false;
+    s.items.forEach(function(it, n){
+      var nuevoParrafo = n === 0 || it.fr.p || it.p;
+      if(nuevoParrafo){ if(abierto) html += "</p>"; html += "<p>"; abierto = true; }
       else { html += " "; }
-      var tinte = TINTES[fr.a] || "0,0%";
-      var cls = "f" + (estado.nuevo === i ? " nuevo" : "");
-      html += '<span class="'+cls+'" data-i="'+i+'" data-a="'+fr.a+'" style="--tint:hsla('+tinte+',55%,.13)">'+fr.t+"</span>";
-      if(h.nudos[i+1]) html += '<span class="anclaNudo" data-n="'+(i+1)+'"></span>';
+      var tinte = TINTES[it.fr.a] || "0,0%";
+      var cls = "f" + (estado.nuevo === it.i && !it.alt ? " nuevo" : "") + (it.alt ? " alt" : "");
+      html += '<span class="' + cls + '" style="--tint:hsla(' + tinte + ',55%,.13)">' + it.fr.t + "</span>";
+      if(it.nudo && !estado.deriva) html += '<span class="ancla" data-n="' + it.nudo + '"></span>';
     });
     if(abierto) html += "</p>";
+    if(s.cortada) html += '<span class="mono fin">La historia se detuvo aquí</span>';
     flow.innerHTML = html;
 
-    // marcas marginales en los nudos
-    Array.prototype.forEach.call(flow.querySelectorAll(".anclaNudo"), function(anc){
+    Array.prototype.forEach.call(flow.querySelectorAll(".ancla"), function(anc){
       var m = document.createElement("span");
       m.className = "marca";
       m.textContent = "*";
@@ -268,8 +320,7 @@
   function paginar(){
     var H = altoPagina();
     var total = Math.max(1, Math.ceil(flow.scrollHeight / H));
-    if(estado.pagina > total - 1) estado.pagina = total - 1;
-    if(estado.pagina < 0) estado.pagina = 0;
+    estado.pagina = Math.min(Math.max(0, estado.pagina), total - 1);
     flow.style.transform = "translateY(" + (-estado.pagina * H) + "px)";
     $("#pagina").textContent = (estado.pagina + 1) + " / " + total;
     return total;
@@ -277,49 +328,82 @@
 
   function irA(d){ estado.pagina += d; paginar(); }
 
-  // navegación
   page.addEventListener("click", function(e){
     if(e.target.classList.contains("marca")) return;
+    if(String(window.getSelection())) return;
     var r = page.getBoundingClientRect();
-    irA(e.clientX - r.left > r.width * 0.35 ? 1 : -1);
+    irA(e.clientX - r.left > r.width * 0.32 ? 1 : -1);
   });
   document.addEventListener("keydown", function(e){
-    if($("#turno").hidden === false) return;
-    if(e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); irA(1); }
-    if(e.key === "ArrowLeft") irA(-1);
+    if(!$("#lectura").hidden){
+      if(e.key === "ArrowRight" || e.key === " "){ e.preventDefault(); irA(1); }
+      if(e.key === "ArrowLeft") irA(-1);
+    }
     if(e.key === "Escape") rama.classList.remove("abierta");
   });
   flow.addEventListener("click", function(e){
     if(!e.target.classList.contains("marca")) return;
     e.stopPropagation();
-    var n = HISTORIAS[estado.historia].nudos[e.target.dataset.n];
-    ramaTexto.textContent = n.t;
+    $("#ramaTexto").textContent = HISTORIAS[estado.historia].nudos[e.target.dataset.n].rama[0].t;
     rama.classList.add("abierta");
   });
   rama.addEventListener("click", function(){ rama.classList.remove("abierta"); });
-  window.addEventListener("resize", function(){ render(); });
+  window.addEventListener("resize", function(){ if(!$("#lectura").hidden) render(); });
 
-  // autoría
   $("#bAutoria").addEventListener("click", function(){
     estado.autoria = !estado.autoria;
     flow.classList.toggle("autoria", estado.autoria);
     this.classList.toggle("on", estado.autoria);
   });
 
-  // modos
+  $("#bDeriva").addEventListener("click", function(){
+    if(estado.deriva){ tirarDados(); }
+    else { estado.deriva = true; this.classList.add("on"); tirarDados(); }
+    estado.pagina = 0;
+    modo("leer");
+  });
+
   function modo(m){
     $("#lectura").hidden = m !== "leer";
-    $("#turno").hidden = m !== "turno";
+    $("#indice").hidden  = m !== "indice";
+    $("#turno").hidden   = m !== "turno";
     $("#bLeer").classList.toggle("on", m === "leer");
+    $("#bIndice").classList.toggle("on", m === "indice");
     $("#bTurno").classList.toggle("on", m === "turno");
-    $("#pagina").style.visibility = m === "leer" ? "visible" : "hidden";
-    $("#bAutoria").style.visibility = m === "leer" ? "visible" : "hidden";
-    if(m === "leer") render(); else pintarHojas();
+    ["#bAutoria","#bDeriva","#pagina"].forEach(function(s){
+      $(s).style.visibility = m === "leer" ? "visible" : "hidden";
+    });
+    if(m === "leer") render();
+    if(m === "indice") pintarIndice();
+    if(m === "turno") pintarHojas();
   }
   $("#bLeer").addEventListener("click", function(){ modo("leer"); });
+  $("#bIndice").addEventListener("click", function(){ modo("indice"); });
   $("#bTurno").addEventListener("click", function(){ modo("turno"); });
 
-  // turno
+  function pintarIndice(){
+    $("#listaIndice").innerHTML = HISTORIAS.map(function(h, i){
+      var manos = {};
+      h.ruta.forEach(function(f){ manos[f.a] = 1; });
+      var nudos = Object.keys(h.nudos).length;
+      return '<div class="item" tabindex="0" data-h="' + i + '">'
+        + '<span class="abre">' + h.ruta[0].t + "</span>"
+        + '<span class="meta mono">' + h.ruta.length + " fragmentos · "
+        + Object.keys(manos).length + " manos"
+        + (nudos ? " · " + nudos + " bifurcaciones" : "") + "</span></div>";
+    }).join("");
+    Array.prototype.forEach.call($("#listaIndice").querySelectorAll(".item"), function(el){
+      var abrir = function(){
+        estado.historia = parseInt(el.dataset.h, 10);
+        estado.pagina = 0;
+        if(estado.deriva) tirarDados();
+        modo("leer");
+      };
+      el.addEventListener("click", abrir);
+      el.addEventListener("keydown", function(e){ if(e.key === "Enter") abrir(); });
+    });
+  }
+
   function pintarHojas(){
     var cont = $("#hojas");
     if(estado.turnos <= 0){
@@ -330,9 +414,9 @@
     cont.innerHTML = HISTORIAS.map(function(h, i){
       var n = h.ruta.length;
       var padre = n > 1 ? h.ruta[n-2].t : "";
-      return '<div class="hoja" data-h="'+i+'">'
-        + (padre ? '<span class="padre">'+padre+'</span> ' : "")
-        + '<span class="leaf">'+h.ruta[n-1].t+"</span></div>";
+      return '<div class="hoja" tabindex="0" data-h="' + i + '">'
+        + (padre ? '<span class="padre">' + padre + "</span> " : "")
+        + '<span class="leaf">' + h.ruta[n-1].t + "</span></div>";
     }).join("");
     Array.prototype.forEach.call(cont.querySelectorAll(".hoja"), function(el){
       el.addEventListener("click", function(){
@@ -355,22 +439,26 @@
   $("#enviar").addEventListener("click", function(){
     var t = $("#texto").value.trim();
     var h = HISTORIAS[estado.hojaSel];
-    var salto = h.ruta.length % 5 === 0 ? 1 : 0;
-    h.ruta.push({a:"tu", t:t, p:salto});
+    h.ruta.push({ a:"tu", t:t, p:(h.ruta.length % 5 === 0 ? 1 : 0) });
     estado.turnos--;
     estado.historia = estado.hojaSel;
     estado.nuevo = h.ruta.length - 1;
-    $("#texto").value = ""; $("#cuenta").textContent = "0 / 100";
-    $("#enviar").disabled = true; $("#editor").classList.remove("abierto");
+    estado.deriva = false;
+    $("#bDeriva").classList.remove("on");
+    $("#texto").value = "";
+    $("#cuenta").textContent = "0 / 100";
+    $("#enviar").disabled = true;
+    $("#editor").classList.remove("abierto");
     estado.hojaSel = null;
     actualizarTurnos();
     modo("leer");
-    estado.pagina = 99; paginar();
+    estado.pagina = 999;
+    paginar();
     setTimeout(function(){
       var el = flow.querySelector(".f.nuevo");
       if(el) el.classList.remove("nuevo");
       estado.nuevo = null;
-    }, 2200);
+    }, 2400);
   });
 
   function actualizarTurnos(){
