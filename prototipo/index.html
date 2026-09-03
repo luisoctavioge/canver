@@ -6,28 +6,28 @@
 <title>Canver</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
   :root{
     --lh: 32px;
     --paper: #faf8f3;
-    --ink: #1c1a17;
+    --ink: #24211c;
     --ink-soft: #6b665d;
     --ink-faint: #a9a298;
     --rule: #e2ddd2;
     --accent: #8a7a5e;
     --marca: rgba(180,150,80,.28);
-    --measure: 34em;
+    --measure: 33em;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --paper:#12120f; --ink:#e9e4d9; --ink-soft:#8e887c; --ink-faint:#5b564d; --rule:#2a2823; --accent:#b3a179; --marca:rgba(179,161,121,.22); }
+    :root{ --paper:#12120f; --ink:#e4dfd4; --ink-soft:#8e887c; --ink-faint:#5b564d; --rule:#2a2823; --accent:#b3a179; --marca:rgba(179,161,121,.22); }
   }
   *{ box-sizing:border-box; }
   html{ -webkit-text-size-adjust:100%; }
   html,body{ margin:0; padding:0; background:var(--paper); color:var(--ink); overscroll-behavior:none; }
   body{
-    font-family:"Newsreader", Georgia, "Iowan Old Style", serif;
-    font-size:19px; line-height:var(--lh); font-weight:350;
+    font-family:"IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size:18px; line-height:var(--lh); font-weight:400;
     -webkit-font-smoothing:antialiased;
     display:flex; flex-direction:column; min-height:100vh; min-height:100dvh;
   }
@@ -96,7 +96,7 @@
   #editor.abierto{ display:block; }
   textarea{
     width:100%; border:0; border-bottom:1px solid var(--rule); background:none; resize:none;
-    font-family:inherit; font-size:19px; line-height:var(--lh); color:var(--ink);
+    font-family:inherit; font-size:18px; line-height:var(--lh); color:var(--ink);
     padding:0 0 10px; outline:none; height:calc(var(--lh)*2);
   }
   textarea::placeholder{ color:var(--ink-faint); }
