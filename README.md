@@ -6,6 +6,7 @@ Solo puedes escribir respondiendo a otro fragmento. Los hilos se leen como un te
 
 ## Documentos
 
+- [`CLAUDE.md`](CLAUDE.md) — **empieza aquí.** Todo el contexto del proyecto en un solo documento.
 - [`docs/01-referencias.md`](docs/01-referencias.md) — mapa de referencias y qué aprender de cada una.
 - [`docs/02-sistema-v0.md`](docs/02-sistema-v0.md) — el sistema: primitivas, economía de turnos, resolución del árbol, capa visual.
 
