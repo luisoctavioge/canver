@@ -100,6 +100,7 @@
   }
   .screen.fork.current > .col > p::before{ color:var(--accent); }
   .screen.alt > .col > p{ color:var(--ink-soft); }
+  .opening{ color:var(--ink-faint); display:block; padding-bottom:var(--lh); }
   .ending{ color:var(--ink-faint); }
   .end{ display:block; margin-bottom:16px; }
   .acts{ display:flex; gap:24px; flex-wrap:wrap; }
@@ -320,7 +321,7 @@
     if(a !== "you") PROFILES[a] = { pron: PRONOUNS[i % PRONOUNS.length] };
   });
 
-  var state = { story:0, authorship:false, drift:false, rolls:{}, turns:3,
+  var state = { story:0, chain:[0], authorship:false, drift:false, rolls:{}, turns:3,
                  pickedLeaf:null, fresh:null, choices:{} };
 
   var $ = function(s){ return document.querySelector(s); };
@@ -404,32 +405,62 @@
     });
   }
 
-  function tree(){
-    var h = STORIES[state.story];
+  function tree(si){
+    var h = STORIES[si];
     if(!h.tree) h.tree = build(h);
     return h.tree;
   }
 
   /* The canon is followed by default. A reader's choice or a die diverts it. */
-  function currentRoute(){
-    var n = tree(), route = [];
+  function at(pos, n){ return pos + ":" + n.id; }
+
+  function routeOf(si, pos){
+    var n = tree(si), route = [];
     while(n){
       route.push(n);
       if(!n.kids.length) break;
-      var i = 0;
-      if(state.drift && state.rolls[n.id] != null) i = state.rolls[n.id];
-      else if(state.choices[n.id] != null) i = state.choices[n.id];
+      var i = 0, key = at(pos, n);
+      if(state.drift && state.rolls[key] != null) i = state.rolls[key];
+      else if(state.choices[key] != null) i = state.choices[key];
       n = n.kids[Math.min(i, n.kids.length - 1)];
     }
     return route;
   }
 
+  function rollFor(pos){
+    (function rec(n){
+      if(n.kids.length > 1) state.rolls[at(pos, n)] = Math.floor(Math.random() * n.kids.length);
+      n.kids.forEach(rec);
+    })(tree(state.chain[pos]));
+  }
+
   function rollDice(){
     state.rolls = {};
-    (function rec(n){
-      if(n.kids.length > 1) state.rolls[n.id] = Math.floor(Math.random() * n.kids.length);
-      n.kids.forEach(rec);
-    })(tree());
+    state.chain.forEach(function(si, pos){ rollFor(pos); });
+  }
+
+  /* Reading does not stop at the end of a story: the next one follows, and the
+     road ahead is always kept longer than the reader. What chains is finite —
+     each story ends — so this is an anthology, not a feed. */
+  function extendChain(){
+    var last = state.chain[state.chain.length - 1], pool = [];
+    STORIES.forEach(function(h, i){ if(i !== last) pool.push(i); });
+    state.chain.push(pool.length ? pool[Math.floor(Math.random() * pool.length)] : last);
+    /* Only the new stretch gets dice: what you already read must not change. */
+    if(state.drift) rollFor(state.chain.length - 1);
+  }
+
+  /* One flat list of screens across every story in the chain. */
+  function entries(){
+    var out = [];
+    state.chain.forEach(function(si, s){
+      var route = routeOf(si, s);
+      route.forEach(function(n, k){
+        out.push({ si:si, pos:s, node:n, parent: k > 0 ? route[k - 1] : null, opens: k === 0 && s > 0 });
+      });
+      out.push({ si:si, ending:true, last: route[route.length - 1] });
+    });
+    return out;
   }
 
   /* ---------- reading: one screen per paragraph ---------- */
@@ -462,31 +493,52 @@
   function echo(p){ return '<div class="before">' + paraHTML(tail(p), true) + "</div>"; }
 
   function render(){
-    var route = currentRoute(), html = "";
-    route.forEach(function(p, k){
-      var parent = k > 0 ? route[k - 1] : null;
-      var isFork = !!(parent && parent.kids.length > 1);
-      var isAlt = isFork && parent.kids.indexOf(p) > 0;
+    var list = entries(), html = "";
+    list.forEach(function(e){
+      if(e.ending){
+        html += '<div class="screen ending"><div class="col">' + echo(e.last)
+          + '<span class="mono end">The story stopped here</span>'
+          + '<span class="acts"><button class="goOn" data-s="' + e.si + '">Continue it</button>'
+          + '<button class="another">Another story</button></span></div></div>';
+        return;
+      }
+      var isFork = !!(e.parent && e.parent.kids.length > 1);
+      var isAlt = isFork && e.parent.kids.indexOf(e.node) > 0;
+      /* A story that opens says so where the echo would be: there is nothing
+         behind it to carry over. */
+      var arriba = e.parent ? echo(e.parent)
+        : (e.opens ? '<span class="mono opening">A new story</span>' : "");
       html += '<div class="screen' + (isFork ? " fork" : "") + (isAlt ? " alt" : "") + '">'
-        + '<div class="col">' + (parent ? echo(parent) : "") + paraHTML(p, false) + "</div></div>";
+        + '<div class="col">' + arriba + paraHTML(e.node, false) + "</div></div>";
     });
-    html += '<div class="screen ending"><div class="col">'
-      + echo(route[route.length - 1])
-      + '<span class="mono end">The story stopped here</span>'
-      + '<span class="acts"><button id="bGoOn">Continue it</button>'
-      + '<button id="bAnother">Another story</button></span></div></div>';
     flow.innerHTML = html;
     if(typeof hand !== "undefined") hand.classList.remove("open");
-    $("#bAnother").addEventListener("click", function(){ mode("index"); });
-    /* You reached the end, so you can carry it on: the turn opens on this story. */
-    $("#bGoOn").addEventListener("click", function(){
-      var cual = state.story;
-      mode("turn");
-      var fila = $('.leafrow[data-h="' + cual + '"]');
-      if(fila) fila.click();
+    Array.prototype.forEach.call(flow.querySelectorAll(".another"), function(b){
+      b.addEventListener("click", function(){ mode("index"); });
+    });
+    /* You reached the end, so you can carry it on: the turn opens on that story. */
+    Array.prototype.forEach.call(flow.querySelectorAll(".goOn"), function(b){
+      b.addEventListener("click", function(){
+        var si = parseInt(b.dataset.s, 10);
+        mode("turn");
+        var fila = $('.leafrow[data-h="' + si + '"]');
+        if(fila) fila.click();
+      });
     });
     measure();
     markCurrent();
+  }
+
+  var extending = false;
+  function keepAhead(){
+    if(extending) return;
+    if(currentIndex() < screens().length - 3) return;
+    extending = true;
+    var y = window.scrollY;
+    extendChain();
+    render();
+    window.scrollTo(0, y);
+    extending = false;
   }
 
   function screens(){ return flow.querySelectorAll(".screen"); }
@@ -523,12 +575,12 @@
      is a single gesture, right to left, and it always advances: past the last
      one you come back to the canon. */
   function nextVersion(){
-    var route = currentRoute(), k = currentIndex();
-    if(k <= 0 || k >= route.length) return;
-    var parent = route[k - 1];
+    var list = entries(), k = currentIndex(), e = list[k];
+    if(!e || e.ending || !e.parent) return;
+    var parent = e.parent;
     if(parent.kids.length < 2) return;
-    var current = parent.kids.indexOf(route[k]);
-    state.choices[parent.id] = (current + 1) % parent.kids.length;
+    var current = parent.kids.indexOf(e.node);
+    state.choices[at(e.pos, parent)] = (current + 1) % parent.kids.length;
     if(state.drift){ state.drift = false; $("#bDrift").classList.remove("on"); }
     render();
     goToScreen(k);
@@ -562,7 +614,9 @@
   });
 
   window.addEventListener("scroll", function(){
-    if(!$("#reading").hidden) markCurrent();
+    if($("#reading").hidden) return;
+    markCurrent();
+    keepAhead();
   }, {passive:true});
   window.addEventListener("resize", function(){
     if($("#reading").hidden) return;
@@ -614,26 +668,26 @@
     state.drift = !state.drift;
     this.classList.toggle("on", state.drift);
     if(state.drift){ state.choices = {}; rollDice(); }
-    mode("leer");
+    mode("read");
   });
 
   function mode(m){
-    $("#reading").hidden = m !== "leer";
+    $("#reading").hidden = m !== "read";
     $("#index").hidden  = m !== "index";
     $("#turn").hidden   = m !== "turn";
-    $("#bRead").classList.toggle("on", m === "leer");
+    $("#bRead").classList.toggle("on", m === "read");
     $("#bIndex").classList.toggle("on", m === "index");
     $("#bTurn").classList.toggle("on", m === "turn");
     ["#bAuthorship","#bDrift"].forEach(function(s){
-      $(s).style.visibility = m === "leer" ? "visible" : "hidden";
+      $(s).style.visibility = m === "read" ? "visible" : "hidden";
     });
-    root.classList.toggle("snap", m === "leer");
-    if(m === "leer") render();
+    root.classList.toggle("snap", m === "read");
+    if(m === "read"){ render(); keepAhead(); }
     if(m === "index") paintIndex();
     if(m === "turn") paintLeaves();
     window.scrollTo(0, 0);
   }
-  $("#bRead").addEventListener("click", function(){ mode("leer"); });
+  $("#bRead").addEventListener("click", function(){ mode("read"); });
   $("#bIndex").addEventListener("click", function(){ mode("index"); });
   $("#bTurn").addEventListener("click", function(){ mode("turn"); });
 
@@ -651,9 +705,10 @@
     Array.prototype.forEach.call($("#indexList").querySelectorAll(".item"), function(el){
       var openStory = function(){
         state.story = parseInt(el.dataset.h, 10);
+        state.chain = [state.story];
         state.choices = {};
         if(state.drift) rollDice();
-        mode("leer");
+        mode("read");
       };
       el.addEventListener("click", openStory);
       el.addEventListener("keydown", function(e){ if(e.key === "Enter") openStory(); });
@@ -707,6 +762,7 @@
     hands = null;                         // and the census of hands is recounted
     state.turns--;
     state.story = state.pickedLeaf;
+    state.chain = [state.story];
     state.fresh = fr;
     state.choices = {};
     state.drift = false;
@@ -717,7 +773,7 @@
     $("#editor").classList.remove("open");
     state.pickedLeaf = null;
     updateTurns();
-    mode("leer");
+    mode("read");
     var justAdded = flow.querySelector(".f.fresh");
     if(justAdded){
       var ps = screens(), own = justAdded.closest(".screen");
@@ -734,7 +790,7 @@
   }
 
   updateTurns();
-  mode("leer");
+  mode("read");
 })();
 </script>
 </body>

@@ -109,7 +109,7 @@ It shows **leaves** — open endings waiting for a continuation. Few (3–5) at 
 2. **Book composition.** Single column, 60–70 characters per line, generous leading, real margins.
 3. **The seam is a space, not a line.** The boundary between fragments does not coincide with any visual boundary.
 4. **The paragraph is emergent, not published.** Exactly five lines, by five different hands. Nobody decides where one breaks: the count does. Continuing joins the last paragraph while there is room and opens a new one when it is full, and nobody may write twice inside the same paragraph — five lines are always five people.
-5. **Two axes.** Vertical is the time of the story: **one paragraph per screen**, from beginning to end. Horizontal is the other versions of that same moment. What is forbidden is *infinite* scrolling —the feed that never closes—, not scrolling: a route is finite and it ends. *(Revised 03-sep-2026. The previous version paginated and the gesture was tapping to turn the page; on a phone nobody finds it, because the learned gesture for reading a long text is swiping.)*
+5. **Two axes, and the reading does not stop.** Vertical is the time of the story: **one paragraph per screen**, from beginning to end; when a story ends, the next one follows if you keep scrolling, and it announces itself where the echo would be. Horizontal is the other versions of that same moment. *(Revised 03-sep-2026: the previous version paginated, and on a phone nobody found the tap. Revised again 04-sep-2026: the scroll now chains story after story, which §7 used to forbid. What separates this from a feed is not the length of the corpus but that **each story ends, says so, and the next is announced** — the boundary is a threshold, not a hairline. A cap on paragraphs per story is what guarantees it, and is still to be defined.)*
 6. **Versions are ordered left to right and the canon is the leftmost one.** There is a single gesture, right to left, and it always advances; past the last one you come back to the canon. A single direction makes the axis learnable without explaining it: there is no need to discover that you can also go back.
 7. **The tail of the previous paragraph shows above**, faint and clipped to two lines. It gives continuity while reading and makes the fork legible: on switching version the one above does not change, so you can see that both continuations come out of the same parent. As each screen arrives, that paragraph brakes and dims while the new one brightens.
 8. **A fork does not cut a paragraph short.** It used to, so that the fork would coincide with a paragraph break; but a paragraph is now always five lines, and that takes precedence. *(Revised 04-sep-2026. How a fork opens is still to be designed — see §8.)* A discreet marginal mark says this moment has another version: book apparatus, not a button.
@@ -137,6 +137,7 @@ Short fragments weave paragraphs; long fragments read as separate voices and fal
 4. Does AI take part? Starting position: **no**. It destroys scarcity, which is the asset.
 5. Sustaining it: subscription. Advertising breaks the attention economy of the product.
 6. Could the character limit be a property of the seed (100 / 280)?
+7. **How many paragraphs at most can a story have?** It is what makes a story finite, and therefore what keeps the endless scroll from becoming a feed.
 
 ---
 
