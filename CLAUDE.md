@@ -1,105 +1,106 @@
-# Canver — contexto del proyecto
+# Canver — project context
 
-> Lee este archivo antes de tocar nada. Es el punto de entrada: si solo vas a leer un documento, que sea este.
-
----
-
-## Qué es
-
-Una plataforma social donde **no puedes publicar: solo continuar**. Cada texto que escribes responde al fragmento de alguien más. Los hilos resultantes se leen como un texto continuo —un rollo, no un feed— construido por muchas manos.
-
-**Origen:** el juego escolar del papel doblado. Escribes una oración, pasas la hoja a la persona de atrás, y recibes otra hoja que tienes que continuar. Nadie controla la historia; todos la escriben.
-
-**Principio rector:** *No publicas. Continúas.* La unidad de valor no es la publicación: es el enlace. Cada decisión de producto existe para proteger una sola cosa — que continuar lo ajeno sea más deseable que hablar de uno mismo.
+> Read this file before touching anything. It is the entry point: if you are only going to read one document, make it this one.
 
 ---
 
-## Reglas no negociables
+## What it is
 
-Si alguna de estas se rompe, deja de ser Canver y se vuelve una red social más.
+A social platform where **you cannot publish: you can only continue**. Every text you write answers someone else's fragment. The resulting threads read as one continuous text —a scroll, not a feed— built by many hands.
 
-1. **Solo se publica respondiendo.** No existe el post suelto. Sembrar una historia nueva es posible pero caro.
-2. **Las respuestas son escasas.** 3 turnos por semana. La escasez no es una limitante: es lo que convierte cada respuesta en una decisión editorial.
-3. **Sembrar cuesta más que continuar.** 3 turnos vs 1, y el derecho a sembrar se desbloquea habiendo continuado. Sin esto, todos siembran y nadie continúa.
-4. **No hay likes ni votos.** La única métrica es la **fecundidad**: cuántas continuaciones nacieron de tu fragmento. Es infalsificable porque cada punto le cuesta un turno escaso a otra persona, y premia el fragmento abierto en vez del fragmento brillante y cerrado.
-5. **Al escribir ves dos fragmentos; al leer ves todo.** Traducción de la regla del renga japonés (*enlace y cambio*). Produce coherencia local y deriva global.
-6. **La lectura tiene dos ejes.** Vertical es el tiempo de la historia: un párrafo por pantalla, de principio a fin. Horizontal son las otras versiones de ese mismo momento. Sin tarjetas, sin avatares, sin timestamps, sin contadores. Lo prohibido no es el scroll: es el scroll *infinito*. Una ruta es finita y tiene final visible; un feed no termina nunca. La costura entre fragmentos es un espacio, nunca una línea visible.
-7. **La autoría está apagada por default.** Primero lees un texto; luego, si activas el modo autoría, lo ves romperse en muchas manos, y tocando un fragmento sabes de quién es. Esa revelación es el momento emocional del producto y se quema si la autoría es visible todo el tiempo.
-8. **La IA no escribe fragmentos.** Destruiría la escasez, que es el activo entero del sistema.
+**Origin:** the schoolyard folded-paper game. You write a sentence, pass the sheet to the person behind you, and receive another sheet you have to continue. Nobody controls the story; everybody writes it.
+
+**Guiding principle:** *You don't publish. You continue.* The unit of value is not the post: it is the link. Every product decision exists to protect one single thing — that continuing someone else's work is more desirable than talking about yourself.
 
 ---
 
-## Decisiones tomadas
+## Non-negotiable rules
 
-| Decisión | Valor | Nota |
+If any of these breaks, it stops being Canver and turns into one more social network.
+
+1. **You can only publish by answering.** There is no standalone post. Seeding a new story is possible but expensive.
+2. **Answers are scarce.** 3 turns a week. Scarcity is not a limitation: it is what turns every answer into an editorial decision.
+3. **Seeding costs more than continuing.** 3 turns against 1, and the right to seed is unlocked by having continued. Without this, everybody seeds and nobody continues.
+4. **There are no likes and no votes.** The only metric is **fecundity**: how many continuations were born from your fragment. It is unfalsifiable because every point costs another person one of their scarce turns, and it rewards the open fragment instead of the brilliant closed one.
+5. **When writing you see two fragments; when reading you see everything.** A translation of the Japanese renga rule (*link and shift*). It produces local coherence and global drift.
+6. **Reading has two axes.** Vertical is the time of the story: one paragraph per screen, from beginning to end. Horizontal is the other versions of that same moment. No cards, no avatars, no timestamps, no counters. What is forbidden is not scrolling: it is *infinite* scrolling. A route is finite and has a visible ending; a feed never ends. The seam between fragments is a space, never a visible line.
+7. **Authorship is off by default.** First you read a text; then, if you turn on authorship mode, you watch it break into many hands, and tapping a fragment tells you whose it is. That revelation is the emotional moment of the product and it burns out if authorship is visible all the time.
+8. **AI does not write fragments.** It would destroy scarcity, which is the entire asset of the system. *(Amended 03-sep-2026 for the prototype only: the sample fiction was translated into English on the owner's explicit instruction. The rule stands for the product.)*
+
+---
+
+## Decisions taken
+
+| Decision | Value | Note |
 |---|---|---|
-| Topología | **Árbol legible** | Cualquiera continúa desde cualquier punto; al leer, cada nudo se resuelve. |
-| Canon | **Peso del subárbol** | Gana la rama con más fragmentos acumulados: cada uno es un turno que alguien gastó. Se recalcula. Empate → la más antigua. |
-| Resolver un nudo | **Canon, a mano o al azar** | Una sola primitiva. El canon por defecto, el eje horizontal a mano, Deriva con el dado. |
-| Unidad | **Texto, ~100 caracteres** | Fragmentos cortos tejen párrafos; los largos se leen como voces sueltas y regresan a la forma de lista. |
-| Medios | **Solo texto en el MVP** | Imagen, audio, código y video quedan para después. |
-| Tipografía | **IBM Plex Sans** (lectura) + **IBM Plex Mono** (aparato) | Una superfamilia, dos roles. 18px sobre retícula de 32px. |
-| Sostenimiento | Suscripción, no publicidad | La publicidad rompe la economía de atención del producto. |
+| Topology | **Legible tree** | Anyone continues from any point; when reading, every fork gets resolved. |
+| Canon | **Subtree weight** | The branch with the most accumulated fragments wins: each one is a turn somebody spent. It is recalculated. Ties → the older branch. |
+| Resolving a fork | **Canon, by hand, or by chance** | A single primitive. Canon by default, the horizontal axis by hand, Drift with the die. |
+| Unit | **Text, ~100 characters** | Short fragments weave paragraphs; long ones read as separate voices and fall back into the shape of a list. |
+| Media | **Text only in the MVP** | Image, audio, code and video come later. |
+| Typography | **IBM Plex Sans** (reading) + **IBM Plex Mono** (apparatus) | One superfamily, two roles. 18px on a 32px grid. |
+| Sustaining it | Subscription, not advertising | Advertising breaks the attention economy of the product. |
+| Language | **English**, in the product and the documentation | *(Changed 03-sep-2026. It used to be Spanish.)* |
 
 ---
 
-## Qué NO hacer
+## What NOT to do
 
-Errores que un asistente nuevo comete por default y que aquí están prohibidos:
+Mistakes a new assistant makes by default and that are forbidden here:
 
-- Agregar likes, corazones, votos, contadores de vistas o rankings de popularidad.
-- Convertir la lectura en tarjetas, burbujas de chat, timeline, o un feed que carga sin fin. El rollo continuo de una ruta finita sí es la forma correcta.
-- Mostrar avatares, nombres o timestamps dentro del texto.
-- Ordenar el feed por popularidad (regla anti-Mateo: siempre se mezclan hojas frescas y huérfanas).
-- Meter frameworks, build steps o dependencias al prototipo: es **un solo archivo HTML sin build**.
-- Usar `localStorage` o cualquier storage del navegador en el prototipo. El estado vive en memoria.
-- Generar fragmentos con IA.
-- Escribir copy largo. El producto casi no tiene texto de interfaz, y así se queda.
+- Adding likes, hearts, votes, view counters or popularity rankings.
+- Turning reading into cards, chat bubbles, a timeline, or a feed that loads without end. The continuous scroll of a finite route is the correct form.
+- Showing avatars, names or timestamps inside the text.
+- Sorting the feed by popularity (anti-Matthew rule: fresh and orphaned leaves are always mixed together).
+- Adding frameworks, build steps or dependencies to the prototype: it is **one single HTML file with no build**.
+- Using `localStorage` or any browser storage in the prototype. State lives in memory.
+- Generating fragments with AI.
+- Writing long copy. The product has almost no interface text, and that is how it stays.
 
 ---
 
-## Estado del repo
+## Repo status
 
 ```
-CLAUDE.md               este archivo
-README.md               presentación corta
-docs/01-referencias.md  mapa de referencias y qué aprender de cada una
-docs/02-sistema-v0.md   el sistema completo: primitivas, economía, capa visual
-prototipo/index.html    prototipo estático, un solo archivo, sin dependencias
+CLAUDE.md               this file
+README.md               short presentation
+docs/01-references.md   map of references and what to learn from each
+docs/02-system-v0.md    the whole system: primitives, economy, visual layer
+prototype/index.html    static prototype, one file, no dependencies
 ```
 
-**Fase actual:** 1 — prototipo estático terminado. Simula el producto completo sin backend: lectura de dos ejes (vertical un párrafo por pantalla, horizontal las versiones alternas), canon calculado por peso de subárbol, marcas de bifurcación en el margen, modo autoría, Deriva, índice de historias y flujo de turno con límite de 100 caracteres. El estado vive en memoria; al recargar vuelve al inicio.
+**Current phase:** 1 — static prototype finished. It simulates the whole product with no backend: two-axis reading (vertical one paragraph per screen, horizontal the alternate versions), canon computed by subtree weight, fork marks in the margin, authorship mode, Drift, story index, and the turn flow with a 100-character limit. State lives in memory; reloading returns to the beginning.
 
-**Fase 2 (siguiente):** persistencia real y link compartible, para correr un test de una semana con 20–30 personas.
+**Phase 2 (next):** real persistence and a shareable link, to run a one-week test with 20–30 people.
 
-**Qué se mide en ese test:**
+**What that test measures:**
 
-| Pregunta | Señal |
+| Question | Signal |
 |---|---|
-| ¿La escasez funciona? | % de turnos efectivamente gastados |
-| ¿El texto se lee? | Que alguien externo lea la ruta canónica a ciegas y la disfrute |
-| ¿Dónde ramifica? | Nudos por fragmento. Casi ninguno = río disfrazado; todos = no hay canon posible. |
-| ¿Qué fragmento gana? | ¿Los abiertos son más fecundos que los brillantes? Si no, el incentivo está mal calibrado. |
+| Does scarcity work? | % of turns actually spent |
+| Does the text read? | Someone from outside reads the canonical route blind and enjoys it |
+| Where does it branch? | Forks per fragment. Almost none = a river in disguise; all of them = no canon is possible. |
+| Which fragment wins? | Are open fragments more fecund than brilliant ones? If not, the incentive is miscalibrated. |
 
 ---
 
-## Preguntas abiertas
+## Open questions
 
-- ¿Cómo se anuncia el eje horizontal sin meter cromo? Hoy solo lo delata una marca `*` en el margen, y un gesto que nadie descubre no existe.
-- ¿Entra la **profundidad de lectura** —hasta dónde llegó la gente antes de abandonar una rama— como señal del canon junto a la fecundidad? Sería una enmienda a la regla 4, pero empuja en la misma dirección, a diferencia del like. Aplazado hasta ver correr lo demás.
-- ¿La autoría se revela al final de la lectura, o solo bajo el modo autoría?
-- ¿Existe perfil? ¿Muestra fragmentos o fecundidad?
-- ¿El límite de caracteres podría ser propiedad de la semilla (100 / 280), como quien elige una forma poética?
-- Las ramas alternas se leen en gris para que sepas que estás fuera del canon. Rompe un poco la regla de "cero cromo": ¿se queda o se va?
-- Las ramas del prototipo mueren a los 3 o 4 fragmentos, así que el eje horizontal siempre desemboca en un final abrupto. Falta escribir ramas que sigan, para saber si el desvío se siente como descubrimiento o como castigo.
-- Nombre definitivo. *Canver* es el placeholder actual.
+- How is the horizontal axis announced without adding chrome? Today only a `*` mark in the margin gives it away, and a gesture nobody discovers does not exist.
+- Does **reading depth** —how far people got before abandoning a branch— come in as a canon signal alongside fecundity? It would amend rule 4, but it pushes in the same direction, unlike the like. Deferred until the rest is running.
+- Is authorship revealed at the end of the reading, or only under authorship mode?
+- Is there a profile? Does it show fragments or fecundity?
+- Could the character limit be a property of the seed (100 / 280), the way someone picks a poetic form?
+- Alternate branches read in grey so you know you are off canon. It bends the "zero chrome" rule a little: does it stay or go?
+- The prototype's branches die after 3 or 4 fragments, so the horizontal axis always lands on an abrupt ending. Branches that keep going still need to be written, to find out whether the detour feels like discovery or like punishment.
+- Final name. *Canver* is the current placeholder.
 
 ---
 
-## Cómo trabajar aquí
+## How to work here
 
-- **Idioma:** español, en el producto y en la documentación.
-- **Antes de proponer una feature**, revisa que no viole las reglas no negociables ni la lista de "qué NO hacer".
-- **Antes de construir**, lee `docs/02-sistema-v0.md`. `docs/01-referencias.md` explica por qué cada decisión es como es, y qué mató a los antecedentes (Ficlets, Ficly, FoldingStory, Branch): ninguno murió por concepto, todos por infraestructura y mantenimiento.
-- **El prototipo se edita en su archivo**, no se reescribe desde cero.
-- Cuando una decisión cambie, actualiza este archivo y `docs/02-sistema-v0.md` en el mismo commit.
+- **Language:** English, in the product and in the documentation.
+- **Before proposing a feature**, check that it does not break the non-negotiable rules or the "what NOT to do" list.
+- **Before building**, read `docs/02-system-v0.md`. `docs/01-references.md` explains why each decision is the way it is, and what killed the predecessors (Ficlets, Ficly, FoldingStory, Branch): none of them died of the concept, all of them died of infrastructure and maintenance.
+- **The prototype is edited in its own file**, not rewritten from scratch.
+- When a decision changes, update this file and `docs/02-system-v0.md` in the same commit.

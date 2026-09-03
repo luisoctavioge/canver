@@ -1,22 +1,22 @@
 # Canver
 
-Una plataforma donde **no publicas: continúas**.
+A platform where **you don't publish: you continue**.
 
-Solo puedes escribir respondiendo a otro fragmento. Los hilos se leen como un texto continuo —un rollo, no un feed— construido por muchas manos.
+You can only write by answering someone else's fragment. The threads read as one continuous text —a scroll, not a feed— built by many hands.
 
-## Documentos
+## Documents
 
-- [`CLAUDE.md`](CLAUDE.md) — **empieza aquí.** Todo el contexto del proyecto en un solo documento.
-- [`docs/01-referencias.md`](docs/01-referencias.md) — mapa de referencias y qué aprender de cada una.
-- [`docs/02-sistema-v0.md`](docs/02-sistema-v0.md) — el sistema: primitivas, economía de turnos, resolución del árbol, capa visual.
+- [`CLAUDE.md`](CLAUDE.md) — **start here.** The whole context of the project in a single document.
+- [`docs/01-references.md`](docs/01-references.md) — map of references and what to learn from each one.
+- [`docs/02-system-v0.md`](docs/02-system-v0.md) — the system: primitives, turn economy, resolving the tree, visual layer.
 
-## Prototipo
+## Prototype
 
-- [`prototipo/index.html`](prototipo/index.html) — estático, sin backend, un solo archivo. Ábrelo en el navegador.
+- [`prototype/index.html`](prototype/index.html) — static, no backend, a single file. Open it in a browser.
 
-Simula el producto completo: lectura de dos ejes —vertical avanza la historia un párrafo por pantalla, horizontal cambia a las otras versiones de ese momento—, canon por peso de subárbol, modo autoría, Deriva, y el flujo de turno (elegir una hoja abierta y continuarla en 100 caracteres). El estado vive en memoria: al recargar vuelve al inicio.
+It simulates the whole product: two-axis reading —vertical moves the story forward one paragraph per screen, horizontal switches to the other versions of that moment—, canon by subtree weight, authorship mode, Drift, and the turn flow (pick an open leaf and continue it in 100 characters). State lives in memory: reloading returns to the beginning.
 
-## Estado
+## Status
 
-Fase 1 — prototipo estático para validar la experiencia de lectura.
-Fase 2 — persistencia real y link compartible para el test de una semana con 20–30 personas.
+Phase 1 — static prototype for validating the reading experience.
+Phase 2 — real persistence and a shareable link for the one-week test with 20–30 people.
