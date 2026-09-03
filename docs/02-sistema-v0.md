@@ -1,7 +1,7 @@
 # Canver — Sistema v0
 
 **Fecha:** 03-sep-2026
-**Decisiones:** topología = *árbol legible*. Unidad = texto, ~100 caracteres (MVP solo texto). Experiencia de lectura = **página, no feed**.
+**Decisiones:** topología = *árbol legible*. Unidad = texto, ~100 caracteres (MVP solo texto). Experiencia de lectura = **dos ejes, no feed**: vertical el tiempo de la historia (un párrafo por pantalla), horizontal las versiones alternas de ese momento.
 
 ---
 
@@ -58,8 +58,31 @@ El like premia el fragmento **cerrado y brillante**. Aquí se premia el **abiert
 
 ## 4. Resolución del árbol
 
-- **Canon** — en cada nudo, la ruta sigue a la rama **más fecunda**. El canon lo escribe el gasto colectivo de turnos, no una votación. No hay botón de voto en ninguna parte del producto.
-- **Deriva** — en cada nudo, la ruta se resuelve al azar. Nunca lees la misma historia dos veces.
+Todo nudo se **resuelve**: alguien decide por cuál rama sigue la lectura. Hay una sola primitiva y tres maneras de manejarla.
+
+### Canon — lo resuelve el gasto colectivo
+
+En cada nudo gana la rama cuyo **subárbol acumuló más fragmentos**. No los hijos directos —eso es miope: una rama con tres hijos que se mueren le ganaría a una con un hijo que engendró cuarenta—, sino el peso del subárbol completo.
+
+Cada fragmento de ese peso **es un turno que alguien gastó**. Por eso contar el subárbol es literalmente medir el gasto colectivo. El canon no se vota: se paga. No hay botón de voto en ninguna parte del producto.
+
+Tres propiedades que se siguen de ahí:
+
+1. **El canon no es permanente.** Se recalcula al crecer el árbol. Una rama abandonada pierde el canon frente a otra que sigue creciendo. El texto de hoy puede no ser el de dentro de un mes: es la obra respirando.
+2. **Empate → la rama más antigua.** Estabilidad. Si desempata la recencia, el texto tiembla cada semana.
+3. **Nunca hay arranque en frío.** Un nudo existe *solo si* dos personas ya gastaron turnos ahí. En cada punto de decisión hay datos por construcción.
+
+Queda pendiente el **sesgo de edad**: las ramas viejas acumulan más por haber existido más. Se puede normalizar por tiempo; para el test de una semana se ignora y se mide.
+
+### A mano — lo resuelve el lector
+
+En el eje horizontal de la lectura. Estando en una pantalla bifurcada, cambias de rama y con ella todo lo que cuelga hacia abajo.
+
+No es *elige tu propia aventura*, y la diferencia no es de grado: **la rama no es una oferta, es evidencia.** No dice "elige", dice *aquí la historia también hizo esto*. Estás siguiendo un camino que otras personas recorrieron, no seleccionando la opción B. De ahí la regla dura: **nunca presentar canon y rama como dos opciones equivalentes lado a lado.** Eso sería un menú. El canon es el texto; la rama es una nota al pie en la que puedes meterte.
+
+### Deriva — lo resuelve el azar
+
+La misma acción, automática y de golpe: el dado resuelve todos los nudos de la ruta. Nunca lees la misma historia dos veces. Es un interruptor: al apagarlo vuelves al canon.
 
 ---
 
@@ -77,7 +100,7 @@ Muestra **hojas** — finales abiertos esperando continuación. Pocas (3–5) a 
 
 ---
 
-## 7. Capa visual: la página, no el feed
+## 7. Capa visual: el rollo, no el feed
 
 **Principio:** *la escritura es fragmentaria; la lectura es continua.* Si la lectura muestra las costuras, el sistema se delata como red social.
 
@@ -85,9 +108,11 @@ Muestra **hojas** — finales abiertos esperando continuación. Pocas (3–5) a 
 2. **Composición de libro.** Columna única, 60–70 caracteres por línea, interlínea generosa, serif, márgenes reales.
 3. **La costura es un espacio, no una línea.** El límite entre fragmentos no coincide con ningún límite visual.
 4. **El párrafo es emergente, no publicado.** Cierra cada N fragmentos o al llegar a un nudo.
-5. **Paginación, no scroll infinito.** Pasar página es el gesto del libro.
-6. **La bifurcación es el único evento visual del texto.** Marca marginal discreta: aparato de libro, no botón.
-7. **La autoría vive en el margen, apagada por default.** Un modo *autoría* tiñe cada fragmento por mano: primero lees un texto, luego lo ves romperse en 200 manos.
+5. **Dos ejes.** Vertical es el tiempo de la historia: **un párrafo por pantalla**, de principio a fin. Horizontal son las otras versiones de ese mismo momento. Lo prohibido es el scroll *infinito* —el feed que nunca cierra—, no el scroll: una ruta es finita y termina. *(Revisado 03-sep-2026. La versión anterior paginaba y el gesto era tocar para pasar página; en teléfono nadie lo encuentra, porque el gesto aprendido para leer un texto largo es deslizar.)*
+6. **Las versiones se ordenan de izquierda a derecha y el canon es la de más a la izquierda.** El gesto es uno solo, de derecha a izquierda, y siempre avanza; al pasar la última se vuelve al canon. Una sola dirección hace el eje aprendible sin explicarlo: no hay que descubrir que también se puede volver.
+7. **Arriba asoma la cola del párrafo anterior**, tenue y recortada a dos líneas. Da continuidad al leer y vuelve legible la bifurcación: al cambiar de versión, el de arriba no cambia, así que se ve que las dos continuaciones salen del mismo padre. Al llegar cada pantalla, ese párrafo frena y se apaga mientras el nuevo se aclara.
+8. **La bifurcación cae siempre en un cambio de párrafo**, nunca a media frase. La estructura del texto y la del árbol son la misma cosa. Una marca marginal discreta dice que este momento tiene otra versión: aparato de libro, no botón.
+9. **La autoría está apagada por default.** Un modo *autoría* tiñe cada fragmento por mano: primero lees un texto, luego lo ves romperse en 200 manos. Tocar un fragmento lo sube de tono y da el nombre de esa mano **abajo, en el aparato** —no en el margen, que en teléfono no existe, y no flotando sobre el texto, que taparía las líneas vecinas.
 
 ### Dos objetos, dos lenguajes
 
@@ -107,7 +132,7 @@ Fragmentos cortos tejen párrafos; fragmentos largos se leen como voces separada
 
 1. ¿Autoría revelada al final, o solo bajo el modo *autoría*?
 2. ¿Existe perfil? ¿Muestra fragmentos o fecundidad?
-3. ¿La marca de bifurcación interrumpe la lectura o aparece en un segundo pase?
+3. ~~¿La marca de bifurcación interrumpe la lectura o aparece en un segundo pase?~~ Resuelto: ni una cosa ni la otra. La marca solo avisa que este momento tiene otra versión; el desvío vive en el eje horizontal. Queda abierto cómo se anuncia ese gesto.
 4. ¿IA participa? Postura de arranque: **no**. Destruye la escasez, que es el activo.
 5. Sostenimiento: suscripción. La publicidad rompe la economía de atención del producto.
 6. ¿El límite de caracteres podría ser propiedad de la semilla (100 / 280)?

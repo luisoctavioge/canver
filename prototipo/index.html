@@ -37,21 +37,73 @@
   .wrap{ width:100%; max-width:var(--measure); }
 
   /* ---------- lectura ---------- */
-  #lectura .page{ overflow:hidden; position:relative; padding-left:34px; margin-left:-34px; }
-  #flow{ position:relative; transition:transform .35s cubic-bezier(.4,0,.2,1); }
-  #flow p{ margin:0; text-wrap:pretty; }
-  #flow p + p{ margin-top:var(--lh); }
+  /* Vertical: el tiempo de la historia, un párrafo por pantalla.
+     Horizontal: las otras versiones de este mismo momento. */
+  html.leyendo{ scroll-snap-type:y mandatory; }
+  #flow{ position:relative; }
+  .pantalla{
+    min-height:calc(100dvh - var(--resta, 120px));
+    scroll-snap-align:start; scroll-snap-stop:always;
+    display:flex; align-items:center;
+    position:relative; padding-left:34px; margin-left:-34px;
+  }
+  .pantalla p{ margin:0; text-wrap:pretty; }
+  .col{ width:100%; }
+  /* la cola del párrafo anterior asoma arriba, tenue: de dónde vienes.
+     Al cambiar de rama es el mismo padre con otra continuación. */
+  .antes{
+    max-height:calc(var(--lh) * 2); overflow:hidden;
+    display:flex; align-items:flex-end;
+    margin-bottom:var(--lh); opacity:.4;
+  }
+  /* Al llegar la pantalla: el párrafo que acabas de leer sigue subiendo un poco,
+     frena y se apaga arriba; el nuevo se aclara para leerse. */
+  @keyframes asentar{
+    from{ opacity:.82; transform:translateY(9px); }
+    to{ opacity:.4; transform:none; }
+  }
+  @keyframes aclarar{
+    from{ opacity:.5; }
+    to{ opacity:1; }
+  }
+  .pantalla.activa .antes{ animation:asentar .42s cubic-bezier(.16,.84,.44,1); }
+  .pantalla.activa > .col > p{ animation:aclarar .5s ease; }
   .f{ transition:background-color 1s ease; border-radius:2px; }
   .f.nuevo{ background-color:var(--marca); }
   #flow.autoria .f{ background-color:var(--tint); }
-  .alt{ color:var(--ink-soft); }
-  .fin{ color:var(--ink-faint); margin-top:var(--lh); display:block; }
-  .marca{
-    position:absolute; left:-34px; width:22px; text-align:right;
-    color:var(--ink-faint); cursor:pointer; font-size:13px; line-height:var(--lh);
-    user-select:none; transition:color .2s;
+  /* en modo autoría, el fragmento señalado sube de tono y da su nombre abajo */
+  #flow.autoria .f.senalado{ background-color:var(--tint2); }
+
+  /* ---------- la mano ---------- */
+  #mano{
+    position:fixed; inset:auto 0 0 0; background:var(--paper);
+    border-top:1px solid var(--rule); padding:26px 24px calc(30px + env(safe-area-inset-bottom));
+    transform:translateY(102%); transition:transform .3s cubic-bezier(.4,0,.2,1);
   }
-  .marca:hover{ color:var(--accent); }
+  #mano.abierta{ transform:none; }
+  #mano .inner{ max-width:var(--measure); margin:0 auto; }
+  #manoNombre{ margin:0 0 4px; }
+  #manoDatos{ margin-bottom:18px; }
+  #manoPerfil{
+    background:none; border:0; padding:0; cursor:pointer; color:var(--accent);
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase;
+  }
+  /* la marca solo dice que este momento tiene otra versión */
+  .pantalla.bifurca::before{
+    content:"*"; position:absolute; left:0; top:50%; margin-top:-16px;
+    width:22px; text-align:right; color:var(--ink-faint);
+    font-size:13px; line-height:var(--lh); transition:color .3s;
+  }
+  .pantalla.bifurca.activa::before{ color:var(--accent); }
+  .pantalla.alterna > .col > p{ color:var(--ink-soft); }
+  .cierre{ color:var(--ink-faint); }
+  .fin{ display:block; margin-bottom:16px; }
+  #bOtra{
+    background:none; border:0; padding:0; cursor:pointer; color:var(--accent);
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase;
+  }
 
   /* ---------- índice ---------- */
   .item{ border-top:1px solid var(--rule); padding:22px 0; cursor:pointer; }
@@ -64,6 +116,7 @@
     display:flex; align-items:center; justify-content:space-between; gap:14px 20px;
     flex-wrap:wrap; padding:18px 24px calc(22px + env(safe-area-inset-bottom));
     color:var(--ink-faint);
+    position:sticky; bottom:0; background:var(--paper);
   }
   .grp{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
   .bar button{
@@ -75,16 +128,7 @@
   .bar button.on{ color:var(--accent); }
   .bar button:focus-visible, .item:focus-visible, .hoja:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
 
-  /* ---------- rama ---------- */
-  #rama{
-    position:fixed; inset:auto 0 0 0; background:var(--paper);
-    border-top:1px solid var(--rule); padding:26px 24px calc(30px + env(safe-area-inset-bottom));
-    transform:translateY(102%); transition:transform .3s cubic-bezier(.4,0,.2,1);
-  }
-  #rama.abierta{ transform:none; }
-  #rama .inner{ max-width:var(--measure); margin:0 auto; }
   .et{ color:var(--ink-faint); display:block; margin-bottom:12px; }
-  #ramaTexto{ margin:0; color:var(--ink-soft); font-style:italic; }
 
   /* ---------- turno ---------- */
   #turno .et{ margin-bottom:24px; }
@@ -105,7 +149,7 @@
   #enviar{ color:var(--accent); }
   #enviar[disabled]{ color:var(--ink-faint); cursor:default; }
   .vacio{ color:var(--ink-faint); font-style:italic; margin:0; }
-  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 </style>
 </head>
 <body>
@@ -114,7 +158,7 @@
   <div class="wrap">
 
     <section id="lectura">
-      <div class="page" id="page"><div id="flow"></div></div>
+      <div id="flow"></div>
     </section>
 
     <section id="indice" hidden>
@@ -143,14 +187,14 @@
   <div class="grp">
     <button id="bAutoria">Autoría</button>
     <button id="bDeriva">Deriva</button>
-    <span id="pagina"></span>
     <span id="turnos"></span>
   </div>
 </div>
 
-<div id="rama"><div class="inner">
-  <span class="mono et">Aquí la historia también hizo esto</span>
-  <p id="ramaTexto"></p>
+<div id="mano"><div class="inner">
+  <p id="manoNombre"></p>
+  <span class="mono et" id="manoDatos"></span>
+  <button id="manoPerfil" class="mono">Ver perfil</button>
 </div></div>
 
 <script>
@@ -260,106 +304,274 @@
 
   var TINTES = {ana:"18,90%",bruno:"48,70%",mireia:"160,55%",kai:"280,45%",dana:"5,75%",jonas:"210,60%",olga:"95,55%",sara:"330,55%",ruy:"35,80%",tavo:"250,50%",lia:"185,60%",martin:"60,70%",isis:"300,50%",nube:"200,50%",cielo:"140,50%",tu:"25,95%"};
 
-  var estado = { historia:0, pagina:0, autoria:false, deriva:false, rolls:{}, turnos:3, hojaSel:null, nuevo:null };
+  /* Pronombres de ejemplo. Van en ciclo por el orden de la lista, a propósito:
+     un nombre no dice el pronombre de nadie, lo dice cada quien de sí. En el
+     producto real esto es un dato que la persona pone en su perfil. */
+  var PRONOMBRES = ["ella", "él", "elle"];
+  var PERFILES = {};
+  Object.keys(TINTES).forEach(function(a, i){
+    if(a !== "tu") PERFILES[a] = { pron: PRONOMBRES[i % PRONOMBRES.length] };
+  });
+
+  var estado = { historia:0, autoria:false, deriva:false, rolls:{}, turnos:3,
+                 hojaSel:null, nuevo:null, elecciones:{} };
 
   var $ = function(s){ return document.querySelector(s); };
-  var page=$("#page"), flow=$("#flow"), rama=$("#rama");
+  var flow = $("#flow"), raiz = document.documentElement;
 
-  function altoPagina(){
-    var libres = window.innerHeight - 170;
-    return Math.max(8, Math.floor(libres / 32)) * 32;
+  /* ---------- el árbol de párrafos ----------
+     La ruta se corta en párrafos donde el fragmento lo pide y en cada nudo, para
+     que la bifurcación caiga siempre en un cambio de párrafo. Cada rama alterna
+     cuelga como hermana del párrafo canónico. El párrafo es la pantalla. */
+
+  var uid = 0;
+  function nodo(frs, desde){ return { id:"n" + (uid++), frs:frs, desde:desde, hijos:[], peso:0 }; }
+
+  /* Peso = fragmentos acumulados en el subárbol, o sea turnos que la gente gastó
+     por ese camino. El hijo de más peso es el canon, y va primero. */
+  function pesar(n){
+    n.peso = n.frs.length;
+    n.hijos.forEach(function(h){ n.peso += pesar(h); });
+    n.hijos.sort(function(a, b){ return b.peso - a.peso; });
+    return n.peso;
+  }
+
+  function construir(h){
+    var corta = {};
+    h.ruta.forEach(function(fr, i){ if(fr.p) corta[i] = 1; });
+    Object.keys(h.nudos).forEach(function(k){ corta[k] = 1; });
+
+    var parrafos = [], actual = null;
+    h.ruta.forEach(function(fr, i){
+      if(!actual || corta[i]){ actual = nodo([], i); parrafos.push(actual); }
+      actual.frs.push(fr);
+    });
+    for(var j = 0; j < parrafos.length - 1; j++) parrafos[j].hijos.push(parrafos[j + 1]);
+
+    Object.keys(h.nudos).forEach(function(k){
+      var j = -1;
+      parrafos.forEach(function(p, x){ if(p.desde === parseInt(k, 10)) j = x; });
+      if(j > 0) parrafos[j - 1].hijos.push(nodo(h.nudos[k].rama.slice(), -1));
+    });
+
+    pesar(parrafos[0]);
+    return parrafos[0];
+  }
+
+  /* Fecundidad: cuántas continuaciones nacieron de tus fragmentos. No es un dato
+     inventado, se cuenta sobre el árbol: cada hijo es un turno que alguien gastó
+     en seguirte. Es la única métrica del sistema. */
+  var manos = null;
+  function censo(){
+    if(manos) return manos;
+    manos = {};
+    function anota(a, hijos){
+      var m = manos[a] || (manos[a] = { fragmentos:0, fecundidad:0 });
+      m.fragmentos += 1;
+      m.fecundidad += hijos;
+    }
+    HISTORIAS.forEach(function(h){
+      h.ruta.forEach(function(fr, i){
+        anota(fr.a, (i + 1 < h.ruta.length ? 1 : 0) + (h.nudos[i + 1] ? 1 : 0));
+      });
+      Object.keys(h.nudos).forEach(function(k){
+        var r = h.nudos[k].rama;
+        r.forEach(function(fr, j){ anota(fr.a, j + 1 < r.length ? 1 : 0); });
+      });
+    });
+    return manos;
+  }
+
+  function arbol(){
+    var h = HISTORIAS[estado.historia];
+    if(!h.arbol) h.arbol = construir(h);
+    return h.arbol;
+  }
+
+  /* Por defecto se sigue el canon. Una elección del lector o un dado lo desvían. */
+  function rutaActual(){
+    var n = arbol(), ruta = [];
+    while(n){
+      ruta.push(n);
+      if(!n.hijos.length) break;
+      var i = 0;
+      if(estado.deriva && estado.rolls[n.id] != null) i = estado.rolls[n.id];
+      else if(estado.elecciones[n.id] != null) i = estado.elecciones[n.id];
+      n = n.hijos[Math.min(i, n.hijos.length - 1)];
+    }
+    return ruta;
   }
 
   function tirarDados(){
-    var h = HISTORIAS[estado.historia];
     estado.rolls = {};
-    Object.keys(h.nudos).forEach(function(k){ estado.rolls[k] = Math.random() < 0.2; });
+    (function rec(n){
+      if(n.hijos.length > 1) estado.rolls[n.id] = Math.floor(Math.random() * n.hijos.length);
+      n.hijos.forEach(rec);
+    })(arbol());
   }
 
-  function secuencia(){
-    var h = HISTORIAS[estado.historia], items = [], cortada = false;
-    for(var i = 0; i < h.ruta.length; i++){
-      items.push({ fr:h.ruta[i], i:i, nudo:h.nudos[i+1] ? i+1 : null });
-      if(estado.deriva && h.nudos[i+1] && estado.rolls[i+1]){
-        h.nudos[i+1].rama.forEach(function(fr, k){ items.push({ fr:fr, alt:true, p:k === 0 }); });
-        cortada = true;
-        break;
-      }
-    }
-    return { items:items, cortada:cortada };
+  /* ---------- lectura: una pantalla por párrafo ---------- */
+
+  function parrafoHTML(p, eco){
+    var s = "<p>";
+    p.frs.forEach(function(fr, x){
+      var tinte = TINTES[fr.a] || "0,0%";
+      s += (x ? " " : "")
+        + '<span class="f' + (!eco && fr === estado.nuevo ? " nuevo" : "")
+        + '" data-a="' + fr.a + '"'
+        + ' style="--tint:hsla(' + tinte + ',55%,.13);--tint2:hsla(' + tinte + ',55%,.34)">'
+        + fr.t + "</span>";
+    });
+    return s + "</p>";
   }
+
+  function eco(p){ return '<div class="antes">' + parrafoHTML(p, true) + "</div>"; }
 
   function render(){
-    var s = secuencia(), html = "", abierto = false;
-    s.items.forEach(function(it, n){
-      var nuevoParrafo = n === 0 || it.fr.p || it.p;
-      if(nuevoParrafo){ if(abierto) html += "</p>"; html += "<p>"; abierto = true; }
-      else { html += " "; }
-      var tinte = TINTES[it.fr.a] || "0,0%";
-      var cls = "f" + (estado.nuevo === it.i && !it.alt ? " nuevo" : "") + (it.alt ? " alt" : "");
-      html += '<span class="' + cls + '" style="--tint:hsla(' + tinte + ',55%,.13)">' + it.fr.t + "</span>";
-      if(it.nudo && !estado.deriva) html += '<span class="ancla" data-n="' + it.nudo + '"></span>';
+    var ruta = rutaActual(), html = "";
+    ruta.forEach(function(p, k){
+      var padre = k > 0 ? ruta[k - 1] : null;
+      var bifurca = !!(padre && padre.hijos.length > 1);
+      var alterna = bifurca && padre.hijos.indexOf(p) > 0;
+      html += '<div class="pantalla' + (bifurca ? " bifurca" : "") + (alterna ? " alterna" : "") + '">'
+        + '<div class="col">' + (padre ? eco(padre) : "") + parrafoHTML(p, false) + "</div></div>";
     });
-    if(abierto) html += "</p>";
-    if(s.cortada) html += '<span class="mono fin">La historia se detuvo aquí</span>';
+    html += '<div class="pantalla cierre"><div class="col">'
+      + eco(ruta[ruta.length - 1])
+      + '<span class="mono fin">La historia se detuvo aquí</span>'
+      + '<button id="bOtra" class="mono">Otra historia</button></div></div>';
     flow.innerHTML = html;
-
-    Array.prototype.forEach.call(flow.querySelectorAll(".ancla"), function(anc){
-      var m = document.createElement("span");
-      m.className = "marca";
-      m.textContent = "*";
-      m.dataset.n = anc.dataset.n;
-      m.style.top = anc.offsetTop + "px";
-      flow.appendChild(m);
-    });
-
-    page.style.height = altoPagina() + "px";
-    paginar();
+    if(typeof mano !== "undefined") mano.classList.remove("abierta");
+    $("#bOtra").addEventListener("click", function(){ modo("indice"); });
+    medir();
+    marcarActiva();
   }
 
-  function paginar(){
-    var H = altoPagina();
-    var total = Math.max(1, Math.ceil(flow.scrollHeight / H));
-    estado.pagina = Math.min(Math.max(0, estado.pagina), total - 1);
-    flow.style.transform = "translateY(" + (-estado.pagina * H) + "px)";
-    $("#pagina").textContent = (estado.pagina + 1) + " / " + total;
-    return total;
+  function pantallas(){ return flow.querySelectorAll(".pantalla"); }
+
+  function medir(){
+    raiz.style.setProperty("--resta", ($(".bar").offsetHeight + 24) + "px");
   }
 
-  function irA(d){ estado.pagina += d; paginar(); }
-
-  page.addEventListener("click", function(e){
-    if(e.target.classList.contains("marca")) return;
-    if(String(window.getSelection())) return;
-    var r = page.getBoundingClientRect();
-    irA(e.clientX - r.left > r.width * 0.32 ? 1 : -1);
-  });
-  document.addEventListener("keydown", function(e){
-    if(!$("#lectura").hidden){
-      if(e.key === "ArrowRight" || e.key === " "){ e.preventDefault(); irA(1); }
-      if(e.key === "ArrowLeft") irA(-1);
+  function indiceActual(){
+    var ps = pantallas(), mejor = 0, min = Infinity;
+    for(var i = 0; i < ps.length; i++){
+      var d = Math.abs(ps[i].getBoundingClientRect().top);
+      if(d < min){ min = d; mejor = i; }
     }
-    if(e.key === "Escape") rama.classList.remove("abierta");
+    return mejor;
+  }
+
+  function marcarActiva(){
+    var ps = pantallas(), k = indiceActual();
+    for(var i = 0; i < ps.length; i++) ps[i].classList.toggle("activa", i === k);
+  }
+
+  function irAPantalla(k){
+    var ps = pantallas();
+    if(!ps[k]) return;
+    window.scrollTo(0, window.scrollY + ps[k].getBoundingClientRect().top);
+    marcarActiva();
+  }
+
+  /* El eje horizontal resuelve el nudo a mano: cambia de hermano y con él todo lo
+     que cuelga hacia abajo. El vertical avanza en el tiempo de la historia.
+
+     Las versiones se ordenan de izquierda a derecha y el canon es la de más a la
+     izquierda. El gesto es uno solo, de derecha a izquierda, y siempre avanza:
+     al pasar la última se vuelve al canon. */
+  function siguienteVersion(){
+    var ruta = rutaActual(), k = indiceActual();
+    if(k <= 0 || k >= ruta.length) return;
+    var padre = ruta[k - 1];
+    if(padre.hijos.length < 2) return;
+    var actual = padre.hijos.indexOf(ruta[k]);
+    estado.elecciones[padre.id] = (actual + 1) % padre.hijos.length;
+    if(estado.deriva){ estado.deriva = false; $("#bDeriva").classList.remove("on"); }
+    render();
+    irAPantalla(k);
+  }
+
+  var tX = 0, tY = 0, tocando = false;
+  window.addEventListener("touchstart", function(e){
+    if($("#lectura").hidden || e.touches.length !== 1) return;
+    tocando = true; tX = e.touches[0].clientX; tY = e.touches[0].clientY;
+  }, {passive:true});
+  window.addEventListener("touchend", function(e){
+    if(!tocando) return;
+    tocando = false;
+    var t = e.changedTouches[0], dx = t.clientX - tX, dy = t.clientY - tY;
+    if(dx < -60 && -dx > Math.abs(dy) * 1.6) siguienteVersion();
+  }, {passive:true});
+
+  var ultimoLado = 0;
+  window.addEventListener("wheel", function(e){
+    if($("#lectura").hidden) return;
+    if(e.deltaX < 24 || e.deltaX < Math.abs(e.deltaY) * 1.4) return;
+    if(Date.now() - ultimoLado < 700) return;
+    ultimoLado = Date.now();
+    siguienteVersion();
+  }, {passive:true});
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape") firmar(null);
+    if($("#lectura").hidden) return;
+    if(e.key === "ArrowRight") siguienteVersion();
   });
+
+  window.addEventListener("scroll", function(){
+    if(!$("#lectura").hidden) marcarActiva();
+  }, {passive:true});
+  window.addEventListener("resize", function(){
+    if($("#lectura").hidden) return;
+    medir(); marcarActiva();
+  });
+
+  /* Con autoría encendida, tocar un fragmento dice de quién es esa mano. */
+  var mano = $("#mano");
+
+  function plural(n, uno, varios){ return n + " " + (n === 1 ? uno : varios); }
+
+  function firmar(el){
+    Array.prototype.forEach.call(flow.querySelectorAll(".senalado"), function(x){
+      x.classList.remove("senalado");
+    });
+    if(!el){ mano.classList.remove("abierta"); return; }
+    el.classList.add("senalado");
+
+    var a = el.dataset.a, m = censo()[a] || { fragmentos:0, fecundidad:0 };
+    var pron = a === "tu" ? "" : (PERFILES[a] || {}).pron;
+    $("#manoNombre").textContent = a === "tu" ? "tú" : a;
+    $("#manoNombre").style.color = "hsl(" + (TINTES[a] || "0,0%") + ",58%)";
+    $("#manoDatos").textContent = (pron ? pron + " · " : "")
+      + plural(m.fragmentos, "fragmento", "fragmentos") + " · "
+      + plural(m.fecundidad, "continuación", "continuaciones");
+    mano.classList.add("abierta");
+  }
+
+  mano.addEventListener("click", function(){ firmar(null); });
+  /* Placeholder: el perfil no existe todavía. */
+  $("#manoPerfil").addEventListener("click", function(e){ e.stopPropagation(); });
+
   flow.addEventListener("click", function(e){
-    if(!e.target.classList.contains("marca")) return;
-    e.stopPropagation();
-    $("#ramaTexto").textContent = HISTORIAS[estado.historia].nudos[e.target.dataset.n].rama[0].t;
-    rama.classList.add("abierta");
+    if(!estado.autoria) return;
+    var el = e.target.closest(".f");
+    firmar(el && flow.contains(el) ? el : null);
   });
-  rama.addEventListener("click", function(){ rama.classList.remove("abierta"); });
-  window.addEventListener("resize", function(){ if(!$("#lectura").hidden) render(); });
 
   $("#bAutoria").addEventListener("click", function(){
     estado.autoria = !estado.autoria;
     flow.classList.toggle("autoria", estado.autoria);
     this.classList.toggle("on", estado.autoria);
+    if(!estado.autoria) firmar(null);
   });
 
+  /* Deriva = el azar resuelve todos los nudos. Es la misma acción que el eje
+     horizontal, pero automática y de golpe. Ahora sí se apaga. */
   $("#bDeriva").addEventListener("click", function(){
-    if(estado.deriva){ tirarDados(); }
-    else { estado.deriva = true; this.classList.add("on"); tirarDados(); }
-    estado.pagina = 0;
+    estado.deriva = !estado.deriva;
+    this.classList.toggle("on", estado.deriva);
+    if(estado.deriva){ estado.elecciones = {}; tirarDados(); }
     modo("leer");
   });
 
@@ -370,12 +582,14 @@
     $("#bLeer").classList.toggle("on", m === "leer");
     $("#bIndice").classList.toggle("on", m === "indice");
     $("#bTurno").classList.toggle("on", m === "turno");
-    ["#bAutoria","#bDeriva","#pagina"].forEach(function(s){
+    ["#bAutoria","#bDeriva"].forEach(function(s){
       $(s).style.visibility = m === "leer" ? "visible" : "hidden";
     });
+    raiz.classList.toggle("leyendo", m === "leer");
     if(m === "leer") render();
     if(m === "indice") pintarIndice();
     if(m === "turno") pintarHojas();
+    window.scrollTo(0, 0);
   }
   $("#bLeer").addEventListener("click", function(){ modo("leer"); });
   $("#bIndice").addEventListener("click", function(){ modo("indice"); });
@@ -395,7 +609,7 @@
     Array.prototype.forEach.call($("#listaIndice").querySelectorAll(".item"), function(el){
       var abrir = function(){
         estado.historia = parseInt(el.dataset.h, 10);
-        estado.pagina = 0;
+        estado.elecciones = {};
         if(estado.deriva) tirarDados();
         modo("leer");
       };
@@ -439,10 +653,14 @@
   $("#enviar").addEventListener("click", function(){
     var t = $("#texto").value.trim();
     var h = HISTORIAS[estado.hojaSel];
-    h.ruta.push({ a:"tu", t:t, p:(h.ruta.length % 5 === 0 ? 1 : 0) });
+    var fr = { a:"tu", t:t, p:(h.ruta.length % 5 === 0 ? 1 : 0) };
+    h.ruta.push(fr);
+    h.arbol = null;                       // el árbol se reconstruye con el fragmento nuevo
+    manos = null;                         // y el censo de manos se recuenta
     estado.turnos--;
     estado.historia = estado.hojaSel;
-    estado.nuevo = h.ruta.length - 1;
+    estado.nuevo = fr;
+    estado.elecciones = {};
     estado.deriva = false;
     $("#bDeriva").classList.remove("on");
     $("#texto").value = "";
@@ -452,11 +670,13 @@
     estado.hojaSel = null;
     actualizarTurnos();
     modo("leer");
-    estado.pagina = 999;
-    paginar();
+    var recien = flow.querySelector(".f.nuevo");
+    if(recien){
+      var ps = pantallas(), suya = recien.closest(".pantalla");
+      for(var i = 0; i < ps.length; i++) if(ps[i] === suya) irAPantalla(i);
+    }
     setTimeout(function(){
-      var el = flow.querySelector(".f.nuevo");
-      if(el) el.classList.remove("nuevo");
+      if(recien) recien.classList.remove("nuevo");
       estado.nuevo = null;
     }, 2400);
   });
@@ -466,7 +686,7 @@
   }
 
   actualizarTurnos();
-  render();
+  modo("leer");
 })();
 </script>
 </body>

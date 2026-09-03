@@ -2,7 +2,7 @@
 
 Una plataforma donde **no publicas: continúas**.
 
-Solo puedes escribir respondiendo a otro fragmento. Los hilos se leen como un texto continuo —una página, no un feed— construida por muchas manos.
+Solo puedes escribir respondiendo a otro fragmento. Los hilos se leen como un texto continuo —un rollo, no un feed— construido por muchas manos.
 
 ## Documentos
 
@@ -14,7 +14,7 @@ Solo puedes escribir respondiendo a otro fragmento. Los hilos se leen como un te
 
 - [`prototipo/index.html`](prototipo/index.html) — estático, sin backend, un solo archivo. Ábrelo en el navegador.
 
-Simula el producto completo: modo lectura paginado, marcas de bifurcación, modo autoría, y el flujo de turno (elegir una hoja abierta y continuarla en 100 caracteres). El estado vive en memoria: al recargar vuelve al inicio.
+Simula el producto completo: lectura de dos ejes —vertical avanza la historia un párrafo por pantalla, horizontal cambia a las otras versiones de ese momento—, canon por peso de subárbol, modo autoría, Deriva, y el flujo de turno (elegir una hoja abierta y continuarla en 100 caracteres). El estado vive en memoria: al recargar vuelve al inicio.
 
 ## Estado
 
