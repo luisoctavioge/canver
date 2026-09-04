@@ -45,7 +45,7 @@
     min-height:100dvh;
     scroll-snap-align:start; scroll-snap-stop:always;
     position:relative; margin-left:-34px;
-    padding:54px 0 var(--reserved, 120px) 34px;
+    padding:76px 0 var(--reserved, 120px) 34px;
   }
   .screen p{ margin:0; text-wrap:pretty; }
   .col{ width:100%; }
@@ -55,7 +55,7 @@
      sentence that starts mid-way cannot be read, and half a fragment is half
      of someone's hand. */
   .before{
-    position:sticky; top:54px; z-index:2;
+    position:sticky; top:76px; z-index:2;
     background:var(--paper); padding-bottom:var(--lh);
     opacity:.4;
   }
@@ -149,17 +149,20 @@
   #spine{
     position:fixed; top:0; left:0; right:0; z-index:6;
     display:flex; justify-content:center;
-    padding:16px 24px 12px; background:var(--paper);
+    padding:12px 24px 10px; background:var(--paper);
   }
   #spine .inner{
     width:100%; max-width:var(--measure);
-    display:flex; flex-direction:column; gap:4px;
+    display:flex; flex-direction:column; gap:6px;
   }
   #spine i{
-    height:2px; width:20px; border-radius:1px; background:var(--ink-faint);
-    opacity:.3; transition:opacity .3s, background-color .3s, width .3s;
+    height:6px; width:46px; border-radius:3px; box-sizing:border-box;
+    background:var(--rule);
+    transition:background-color .3s, width .3s, border-color .3s;
   }
-  #spine i.on{ background:var(--accent); opacity:1; width:34px; }
+  #spine i.on{ background:var(--accent); width:62px; }
+  /* a paragraph nobody has written yet is an outline, not a bar */
+  #spine i.slot{ background:none; border:1px dashed var(--ink-faint); opacity:.55; }
 
   .label{ color:var(--ink-faint); display:block; margin-bottom:12px; }
 
@@ -217,7 +220,6 @@
 
 <div class="bar mono">
   <div class="grp">
-    <button id="bTurn">Continue</button>
   </div>
   <div class="grp">
     <button id="bAuthorship">Authorship</button>
@@ -237,7 +239,7 @@
   "use strict";
 
   var STORIES = [
-    { id:"train",
+    { id:"train-1",
       route:[
         {a:"ana",t:"The last train pulled out with nobody aboard and still arrived late."},
         {a:"bruno",t:"At the station, the stationmaster wrote the exact time in a notebook nobody had asked for."},
@@ -263,7 +265,29 @@
         {a:"jonas",t:"He walked back to the station over his own footprints, which were gone."},
         {a:"olga",t:"The platform was full."},
         {a:"mireia",t:"People in coats, holding tickets, watching a clock he had never installed."},
-        {a:"sara",t:"Not one of them made a sound."},
+        {a:"sara",t:"Not one of them made a sound."}
+      ],
+      forks:{
+        5:{ branches:[[
+          {a:"ruy",t:"The notebook stayed open all night, and the snow came in to read it."},
+          {a:"dana",t:"By morning the ink had run until it formed a different question."},
+          {a:"olga",t:"Nobody ever read it, because the stationmaster never came back."}
+        ]]},
+        15:{ branches:[[
+          {a:"cielo",t:"But he was no longer sure which side was his."},
+          {a:"kai",t:"He knocked, just in case, and a man with his same tired face opened it."},
+          {a:"sara",t:"Both understood at the same moment that one of them was one too many."},
+          {a:"nube",t:"Neither of them moved."}
+        ]]},
+        20:{ branches:[[
+          {a:"nube",t:"The snow had erased the entire station and even so the clock kept going."},
+          {a:"martin",t:"He wrote the time in the air with a finger, because there was no notebook left."},
+          {a:"lia",t:"It was the first time in eleven years that he was on time."}
+        ]]}
+      }
+    },
+    { id:"train-2",
+      route:[
         {a:"ruy",t:"He knew every one of them: they were the hours he had recorded for eleven years."},
         {a:"tavo",t:"A woman came over and handed back the notebook he was already holding."},
         {a:"lia",t:"“We have been reading it,” she said. “It is the only thing that arrives on time.”"},
@@ -288,37 +312,26 @@
         {a:"nube",t:"He got off."},
         {a:"cielo",t:"The house had the table set for two and the soup still warm."},
         {a:"ana",t:"This time he sat on his own side."},
-        {a:"bruno",t:"He left the notebook open at the page that came next."},
-        {a:"kai",t:"And he waited, in no hurry, for someone else to arrive late."}
+        {a:"bruno",t:"He left the notebook open at the page that came next."}
       ],
       forks:{
         5:{ branches:[[
-          {a:"ruy",t:"The notebook stayed open all night, and the snow came in to read it."},
-          {a:"dana",t:"By morning the ink had run until it formed a different question."},
-          {a:"olga",t:"Nobody ever read it, because the stationmaster never came back."}
-        ]]},
-        15:{ branches:[[
-          {a:"cielo",t:"But he was no longer sure which side was his."},
-          {a:"kai",t:"He knocked, just in case, and a man with his same tired face opened it."},
-          {a:"sara",t:"Both understood at the same moment that one of them was one too many."},
-          {a:"nube",t:"Neither of them moved."}
-        ]]},
-        20:{ branches:[[
-          {a:"nube",t:"The snow had erased the entire station and even so the clock kept going."},
-          {a:"martin",t:"He wrote the time in the air with a finger, because there was no notebook left."},
-          {a:"lia",t:"It was the first time in eleven years that he was on time."}
-        ]]},
-        30:{ branches:[[
           {a:"sara",t:"“Nobody gets on,” said the woman. “You stay until the train takes you.”"},
           {a:"jonas",t:"He looked at the crowded platform and counted: eleven years, eleven winters."},
           {a:"isis",t:"He stayed, and went on recording, no longer alone."}
         ]]},
-        40:{ branches:[[
+        15:{ branches:[[
           {a:"isis",t:"He answered none of them: he wrote a new one and left it open for the next."},
           {a:"bruno",t:"The whole carriage turned the page at the same time."},
           {a:"ana",t:"And the train went on, with no destination now, collecting questions."}
         ]]}
       }
+    },
+    { id:"train-3",
+      route:[
+        {a:"kai",t:"And he waited, in no hurry, for someone else to arrive late."}
+      ],
+      forks:{}
     },
     { id:"library",
       route:[
@@ -522,7 +535,7 @@
         out.push({ si:si, pos:s, k:k, of:route.length, node:n,
                    parent: k > 0 ? route[k - 1] : null, opens: k === 0 && s > 0 });
       });
-      out.push({ si:si, ending:true, last: route[route.length - 1] });
+      out.push({ si:si, ending:true, of:route.length, last: route[route.length - 1] });
     });
     return out;
   }
@@ -560,13 +573,8 @@
     var list = entries(), html = "";
     list.forEach(function(e, idx){
       if(e.ending){
-        /* Only offer to carry it on if the story has room left for a line. */
-        var cabe = STORIES[e.si].route.length < PARAS * LINES;
         html += '<div class="screen ending"><div class="col">' + echo(e.last)
-          + '<span class="mono end">The story stopped here</span>'
-          + (cabe ? '<span class="acts"><button class="goOn" data-s="' + e.si
-                    + '">Continue it</button></span>' : "")
-          + "</div></div>";
+          + '<span class="mono end">The story stopped here</span></div></div>';
         return;
       }
       var isFork = !!(e.parent && (e.parent.kids.length > 1 || e.parent.forkKey));
@@ -574,7 +582,11 @@
       /* You write where the line would go, in the same type as everything else:
          no second screen, no field, no counter. A blank version takes a first
          line, a short one takes the next. */
-      var libre = state.turns > 0 && (e.node.blank || (e.node.branch
+      /* The open end of a story takes a line too, right where you are reading:
+         the last paragraph of a route that still has room. */
+      var cola = !e.node.blank && !e.node.branch && e.k === e.of - 1
+        && STORIES[e.si].route.length < PARAS * LINES;
+      var libre = state.turns > 0 && (e.node.blank || ((e.node.branch || cola)
         && e.node.frs.length < LINES
         && !e.node.frs.some(function(fr){ return fr.a === "you"; })));
       var pluma = libre
@@ -607,14 +619,6 @@
         var r = document.createRange(), sel = window.getSelection();
         r.selectNodeContents(w); r.collapse(false);
         sel.removeAllRanges(); sel.addRange(r);
-      });
-    });
-    Array.prototype.forEach.call(flow.querySelectorAll(".goOn"), function(b){
-      b.addEventListener("click", function(){
-        var si = parseInt(b.dataset.s, 10);
-        mode("turn");
-        var fila = $('.leafrow[data-h="' + si + '"]');
-        if(fila) fila.click();
       });
     });
     measure();
@@ -656,8 +660,12 @@
 
   /* Where you are inside the story you are reading, out of its five paragraphs. */
   function paintSpine(e){
-    var d = $("#spine .inner"), en = e && !e.ending ? e.k : -1, html = "";
-    for(var i = 0; i < PARAS; i++) html += '<i class="' + (i === en ? "on" : "") + '"></i>';
+    var d = $("#spine .inner"), html = "";
+    var en = e && !e.ending ? e.k : -1, hay = e ? e.of : 0;
+    for(var i = 0; i < PARAS; i++){
+      var c = i === en ? "on" : (i < hay ? "" : "slot");
+      html += '<i class="' + c + '"></i>';
+    }
     d.innerHTML = html;
   }
 
@@ -776,7 +784,6 @@
     $("#reading").hidden = m !== "read";
     $("#index").hidden  = m !== "index";
     $("#turn").hidden   = m !== "turn";
-    $("#bTurn").classList.toggle("on", m === "turn");
     ["#bAuthorship","#bDrift","#spine"].forEach(function(s){
       $(s).style.visibility = m === "read" ? "visible" : "hidden";
     });
@@ -786,10 +793,6 @@
     if(m === "turn") paintLeaves();
     window.scrollTo(0, 0);
   }
-  /* One door, and it swings both ways: there is nothing else to go back to. */
-  $("#bTurn").addEventListener("click", function(){
-    mode($("#turn").hidden ? "turn" : "read");
-  });
 
   function paintIndex(){
     $("#indexList").innerHTML = STORIES.map(function(h, i){
@@ -859,7 +862,8 @@
     if(!e) return;
     var h = STORIES[e.si], nd = e.node, fr = { a:"you", t:t };
     if(nd.blank) h.forks[nd.host.forkKey].branches.push([fr]);
-    else nd.branch.push(fr);
+    else if(nd.branch) nd.branch.push(fr);
+    else h.route.push(fr);          // el final abierto de la historia
     h.tree = null;
     hands = null;
     state.choices = {};            // rebuilding mints new ids, so they are stale

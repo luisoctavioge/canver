@@ -118,6 +118,8 @@ It shows **leaves** — open endings waiting for a continuation. Few (3–5) at 
 10. **A fork does not cut a paragraph short.** It used to, so that the fork would coincide with a paragraph break; but a paragraph is now always five lines, and that takes precedence. *(Revised 04-sep-2026. How a fork opens is still to be designed — see §8.)* A discreet marginal mark says this moment has another version: book apparatus, not a button.
 11. **Authorship is off by default.** An *authorship* mode tints every fragment by hand: first you read a text, then you watch it break into 200 hands. Tapping a fragment deepens its tone and gives the name of that hand **below, in the apparatus** — not in the margin, which does not exist on a phone, and not floating over the text, which would cover the neighbouring lines.
 
+*(05-sep-2026: in the prototype the two have collapsed into one. Writing happens inside the reading — a caret where the line will go — so the turn screen has no entry point left. The table below still describes the intended split for when the turn needs more than a line of text.)*
+
 ### Two objects, two languages
 
 | | **Reading mode** | **Turn mode** |
