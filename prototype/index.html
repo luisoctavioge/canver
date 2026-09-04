@@ -110,6 +110,14 @@
     letter-spacing:.08em; text-transform:uppercase;
   }
   .acts button:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
+  /* the invitation to write only shows on the screen you are standing on:
+     otherwise it would be chrome repeated on every unit */
+  .addline{
+    display:none; margin-top:var(--lh);
+    background:none; border:0; padding:0; cursor:pointer; color:var(--accent);
+  }
+  .screen.current .addline{ display:inline-block; }
+  .addline:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
 
   /* ---------- index ---------- */
   .item{ border-top:1px solid var(--rule); padding:22px 0; cursor:pointer; }
@@ -133,6 +141,14 @@
   .bar button:hover{ color:var(--ink); }
   .bar button.on{ color:var(--accent); }
   .bar button:focus-visible, .item:focus-visible, .leafrow:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
+
+  /* four dots: which paragraph of the story you are standing on */
+  .dots{ display:flex; gap:7px; align-items:center; }
+  .dots i{
+    width:5px; height:5px; border-radius:50%;
+    background:var(--ink-faint); opacity:.45; transition:opacity .3s, background-color .3s;
+  }
+  .dots i.on{ background:var(--accent); opacity:1; }
 
   .label{ color:var(--ink-faint); display:block; margin-bottom:12px; }
 
@@ -195,6 +211,7 @@
   <div class="grp">
     <button id="bAuthorship">Authorship</button>
     <button id="bDrift">Drift</button>
+    <span id="dots" class="dots"></span>
     <span id="turns"></span>
   </div>
 </div>
@@ -265,32 +282,32 @@
         {a:"kai",t:"And he waited, in no hurry, for someone else to arrive late."}
       ],
       forks:{
-        5:{ branch:[
+        5:{ branches:[[
           {a:"ruy",t:"The notebook stayed open all night, and the snow came in to read it."},
           {a:"dana",t:"By morning the ink had run until it formed a different question."},
           {a:"olga",t:"Nobody ever read it, because the stationmaster never came back."}
-        ]},
-        15:{ branch:[
+        ]]},
+        15:{ branches:[[
           {a:"cielo",t:"But he was no longer sure which side was his."},
           {a:"kai",t:"He knocked, just in case, and a man with his same tired face opened it."},
           {a:"sara",t:"Both understood at the same moment that one of them was one too many."},
           {a:"nube",t:"Neither of them moved."}
-        ]},
-        20:{ branch:[
+        ]]},
+        20:{ branches:[[
           {a:"nube",t:"The snow had erased the entire station and even so the clock kept going."},
           {a:"martin",t:"He wrote the time in the air with a finger, because there was no notebook left."},
           {a:"lia",t:"It was the first time in eleven years that he was on time."}
-        ]},
-        30:{ branch:[
+        ]]},
+        30:{ branches:[[
           {a:"sara",t:"“Nobody gets on,” said the woman. “You stay until the train takes you.”"},
           {a:"jonas",t:"He looked at the crowded platform and counted: eleven years, eleven winters."},
           {a:"isis",t:"He stayed, and went on recording, no longer alone."}
-        ]},
-        40:{ branch:[
+        ]]},
+        40:{ branches:[[
           {a:"isis",t:"He answered none of them: he wrote a new one and left it open for the next."},
           {a:"bruno",t:"The whole carriage turned the page at the same time."},
           {a:"ana",t:"And the train went on, with no destination now, collecting questions."}
-        ]}
+        ]]}
       }
     },
     { id:"library",
@@ -322,7 +339,7 @@
   });
 
   var state = { story:0, chain:[0], authorship:false, drift:false, rolls:{}, turns:3,
-                 pickedLeaf:null, fresh:null, choices:{} };
+                 pickedLeaf:null, target:null, fresh:null, choices:{} };
 
   var $ = function(s){ return document.querySelector(s); };
   var flow = $("#flow"), root = document.documentElement;
@@ -350,6 +367,11 @@
      paragraph short — how a fork opens is still to be designed. */
   var LINES = 5;
 
+  /* A story is four paragraphs at most. With five hands per paragraph that is
+     also a headcount: twenty different people, and then it ends. The vertical
+     axis is finite on purpose; only the horizontal one is open-ended. */
+  var PARAS = 4;
+
   function build(h){
     var paras = [], current = null;
     h.route.forEach(function(fr, i){
@@ -358,11 +380,20 @@
     });
     for(var j = 0; j < paras.length - 1; j++) paras[j].kids.push(paras[j + 1]);
 
-    /* A fork opens at a paragraph boundary, so its branch is a whole alternate
-       paragraph: swiping swaps five lines for five others, not half of each. */
+    /* A fork opens at a paragraph boundary, so each branch is a whole alternate
+       paragraph: swiping swaps five lines for five others, not half of each.
+       A fork holds as many versions as people care to write — the horizontal
+       axis has no cap, unlike the vertical one. */
     Object.keys(h.forks).forEach(function(k){
       var j = parseInt(k, 10) / LINES;
-      if(j > 0 && j === Math.floor(j)) paras[j - 1].kids.push(node(h.forks[k].branch.slice(), -1));
+      if(j <= 0 || j !== Math.floor(j)) return;
+      var papa = paras[j - 1];
+      papa.forkKey = k;
+      h.forks[k].branches.forEach(function(br){
+        var bn = node(br.slice(), -1);
+        bn.branch = br;              // para poder escribirle una linea mas
+        papa.kids.push(bn);
+      });
     });
 
     weigh(paras[0]);
@@ -414,14 +445,35 @@
   /* The canon is followed by default. A reader's choice or a die diverts it. */
   function at(pos, n){ return pos + ":" + n.id; }
 
+  /* Rebuilding a tree mints new node ids, so every choice keyed to the old ones
+     goes stale and the reading snaps back to canon. After writing sideways,
+     re-aim the reading at the version the line just landed in. */
+  function aimAt(si, fr){
+    state.chain.forEach(function(sj, pos){
+      if(sj !== si) return;
+      (function rec(n){
+        n.kids.forEach(function(kid, i){
+          if(kid.frs.indexOf(fr) >= 0) state.choices[at(pos, n)] = i;
+          rec(kid);
+        });
+      })(tree(si));
+    });
+  }
+
   function routeOf(si, pos){
     var n = tree(si), route = [];
     while(n){
       route.push(n);
-      if(!n.kids.length) break;
+      if(route.length >= PARAS || !n.kids.length) break;
       var i = 0, key = at(pos, n);
       if(state.drift && state.rolls[key] != null) i = state.rolls[key];
       else if(state.choices[key] != null) i = state.choices[key];
+      /* Past the last version there is an empty one: reaching the end of the
+         versions is itself the invitation to write the next. */
+      if(n.forkKey && i >= n.kids.length){
+        route.push({ blank:true, frs:[], kids:[], from:-1, id:"b" + n.id, host:n });
+        break;
+      }
       n = n.kids[Math.min(i, n.kids.length - 1)];
     }
     return route;
@@ -456,7 +508,8 @@
     state.chain.forEach(function(si, s){
       var route = routeOf(si, s);
       route.forEach(function(n, k){
-        out.push({ si:si, pos:s, node:n, parent: k > 0 ? route[k - 1] : null, opens: k === 0 && s > 0 });
+        out.push({ si:si, pos:s, k:k, of:route.length, node:n,
+                   parent: k > 0 ? route[k - 1] : null, opens: k === 0 && s > 0 });
       });
       out.push({ si:si, ending:true, last: route[route.length - 1] });
     });
@@ -494,7 +547,7 @@
 
   function render(){
     var list = entries(), html = "";
-    list.forEach(function(e){
+    list.forEach(function(e, idx){
       if(e.ending){
         html += '<div class="screen ending"><div class="col">' + echo(e.last)
           + '<span class="mono end">The story stopped here</span>'
@@ -502,14 +555,27 @@
           + '<button class="another">Another story</button></span></div></div>';
         return;
       }
-      var isFork = !!(e.parent && e.parent.kids.length > 1);
-      var isAlt = isFork && e.parent.kids.indexOf(e.node) > 0;
+      var isFork = !!(e.parent && (e.parent.kids.length > 1 || e.parent.forkKey));
+      var isAlt = isFork && !e.node.blank && e.parent.kids.indexOf(e.node) > 0;
+      /* You can write here if this version is not full and your hand is not in
+         it yet: a blank one takes a first line, a short one takes the next. */
+      var libre = state.turns > 0 && (e.node.blank || (e.node.branch
+        && e.node.frs.length < LINES
+        && !e.node.frs.some(function(fr){ return fr.a === "you"; })));
+      var invita = libre
+        ? '<button class="addline mono" data-i="' + idx + '">'
+          + (e.node.blank ? "Start this version" : "Add a line") + "</button>"
+        : "";
       /* A story that opens says so where the echo would be: there is nothing
          behind it to carry over. */
       var arriba = e.parent ? echo(e.parent)
         : (e.opens ? '<span class="mono opening">A new story</span>' : "");
-      html += '<div class="screen' + (isFork ? " fork" : "") + (isAlt ? " alt" : "") + '">'
-        + '<div class="col">' + arriba + paraHTML(e.node, false) + "</div></div>";
+      html += '<div class="screen' + (isFork ? " fork" : "") + (isAlt ? " alt" : "")
+        + (e.node.blank ? " blank" : "") + '">'
+        + '<div class="col">' + arriba
+        + (e.node.blank ? '<span class="mono opening">Nobody has written this one</span>'
+                        : paraHTML(e.node, false))
+        + invita + "</div></div>";
     });
     flow.innerHTML = html;
     if(typeof hand !== "undefined") hand.classList.remove("open");
@@ -517,6 +583,14 @@
       b.addEventListener("click", function(){ mode("index"); });
     });
     /* You reached the end, so you can carry it on: the turn opens on that story. */
+    Array.prototype.forEach.call(flow.querySelectorAll(".addline"), function(b){
+      b.addEventListener("click", function(){
+        var e = entries()[parseInt(b.dataset.i, 10)];
+        if(!e) return;
+        state.target = { si:e.si, node:e.node };
+        mode("turn");
+      });
+    });
     Array.prototype.forEach.call(flow.querySelectorAll(".goOn"), function(b){
       b.addEventListener("click", function(){
         var si = parseInt(b.dataset.s, 10);
@@ -559,6 +633,14 @@
   function markCurrent(){
     var ps = screens(), k = currentIndex();
     for(var i = 0; i < ps.length; i++) ps[i].classList.toggle("current", i === k);
+    paintDots(entries()[k]);
+  }
+
+  /* Where you are inside the story you are reading, out of its four paragraphs. */
+  function paintDots(e){
+    var d = $("#dots"), en = e && !e.ending ? e.k : -1, html = "";
+    for(var i = 0; i < PARAS; i++) html += '<i class="' + (i === en ? "on" : "") + '"></i>';
+    d.innerHTML = html;
   }
 
   function goToScreen(k){
@@ -579,8 +661,9 @@
     if(!e || e.ending || !e.parent) return;
     var parent = e.parent;
     if(parent.kids.length < 2) return;
-    var current = parent.kids.indexOf(e.node);
-    state.choices[at(e.pos, parent)] = (current + 1) % parent.kids.length;
+    var vueltas = parent.forkKey ? parent.kids.length + 1 : parent.kids.length;
+    var current = e.node.blank ? parent.kids.length : parent.kids.indexOf(e.node);
+    state.choices[at(e.pos, parent)] = (current + 1) % vueltas;
     if(state.drift){ state.drift = false; $("#bDrift").classList.remove("on"); }
     render();
     goToScreen(k);
@@ -678,7 +761,7 @@
     $("#bRead").classList.toggle("on", m === "read");
     $("#bIndex").classList.toggle("on", m === "index");
     $("#bTurn").classList.toggle("on", m === "turn");
-    ["#bAuthorship","#bDrift"].forEach(function(s){
+    ["#bAuthorship","#bDrift","#dots"].forEach(function(s){
       $(s).style.visibility = m === "read" ? "visible" : "hidden";
     });
     root.classList.toggle("snap", m === "read");
@@ -689,7 +772,7 @@
   }
   $("#bRead").addEventListener("click", function(){ mode("read"); });
   $("#bIndex").addEventListener("click", function(){ mode("index"); });
-  $("#bTurn").addEventListener("click", function(){ mode("turn"); });
+  $("#bTurn").addEventListener("click", function(){ state.target = null; mode("turn"); });
 
   function paintIndex(){
     $("#indexList").innerHTML = STORIES.map(function(h, i){
@@ -717,6 +800,17 @@
 
   function paintLeaves(){
     var cont = $("#leaves");
+    /* Writing sideways: the turn is already aimed at the version you stood on. */
+    if(state.target){
+      var nd = state.target.node;
+      cont.innerHTML = '<div class="leafrow sel">'
+        + '<span class="leaf">' + (nd.blank ? "A version nobody has written yet"
+            : nd.frs[nd.frs.length - 1].t) + "</span>"
+        + '<span class="meta mono">line ' + (nd.frs.length + 1) + " of " + LINES + "</span></div>";
+      $("#editor").classList.add("open");
+      $("#text").focus();
+      return;
+    }
     if(state.turns <= 0){
       cont.innerHTML = '<p class="empty">No turns left. They come back Monday.</p>';
       $("#editor").classList.remove("open");
@@ -750,13 +844,39 @@
     var n = this.value.trim().length;
     $("#count").textContent = n + " / 100";
     $("#count").parentNode.classList.toggle("over", n > 100);
-    $("#send").disabled = !(n > 0 && n <= 100 && state.pickedLeaf !== null);
+    $("#send").disabled = !(n > 0 && n <= 100 && (state.pickedLeaf !== null || state.target));
   });
 
   $("#send").addEventListener("click", function(){
     var t = $("#text").value.trim();
-    var h = STORIES[state.pickedLeaf];
     var fr = { a:"you", t:t };
+    /* Sideways: the line goes into that version, or opens a brand new one. */
+    if(state.target){
+      var ht = STORIES[state.target.si], nd = state.target.node;
+      if(nd.blank) ht.forks[nd.host.forkKey].branches.push([fr]);
+      else nd.branch.push(fr);
+      ht.tree = null;
+      hands = null;
+      state.choices = {};          // los ids viejos ya no existen
+      aimAt(state.target.si, fr);
+      state.turns--;
+      state.fresh = fr;
+      state.target = null;
+      $("#text").value = "";
+      $("#count").textContent = "0 / 100";
+      $("#send").disabled = true;
+      $("#editor").classList.remove("open");
+      updateTurns();
+      mode("read");
+      var recien = flow.querySelector(".f.fresh");
+      if(recien){
+        var ps = screens(), suya = recien.closest(".screen");
+        for(var x = 0; x < ps.length; x++) if(ps[x] === suya) goToScreen(x);
+        setTimeout(function(){ recien.classList.remove("fresh"); state.fresh = null; }, 2400);
+      }
+      return;
+    }
+    var h = STORIES[state.pickedLeaf];
     h.route.push(fr);
     h.tree = null;                       // the tree is rebuilt with the new fragment
     hands = null;                         // and the census of hands is recounted

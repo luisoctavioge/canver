@@ -37,6 +37,7 @@ If any of these breaks, it stops being Canver and turns into one more social net
 | Canon | **Subtree weight** | The branch with the most accumulated fragments wins: each one is a turn somebody spent. It is recalculated. Ties → the older branch. |
 | Resolving a fork | **Canon, by hand, or by chance** | A single primitive. Canon by default, the horizontal axis by hand, Drift with the die. |
 | Unit | **Text, ~100 characters** | A fragment, also called a line. Short ones weave paragraphs; long ones read as separate voices and fall back into the shape of a list. |
+| Story | **Four paragraphs** | Twenty lines by twenty different people, and it ends. The vertical axis is finite; the horizontal one is not. *(Provisional.)* |
 | Paragraph | **Five lines, five hands** | Exactly five, never fewer once closed, and nobody twice in the same one. The count decides the break, not the writer. |
 | Media | **Text only in the MVP** | Image, audio, code and video come later. |
 | Typography | **IBM Plex Sans** (reading) + **IBM Plex Mono** (apparatus) | One superfamily, two roles. 18px on a 32px grid. |

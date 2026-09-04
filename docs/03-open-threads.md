@@ -1,41 +1,17 @@
 # Canver — Open threads
 
-**Opened:** 04-sep-2026, at the end of a session spent on the reading model.
+**Opened:** 04-sep-2026. **Last pruned:** 05-sep-2026.
 **What this is:** everything that is still being thought through, written down so it does not get lost. Nothing here is decided. When something here gets decided it moves to `02-system-v0.md` and disappears from this file.
 
 ---
 
 ## 1. The feeling to protect
 
-**The reading should feel infinite.** That is the goal the rest of this file serves. The counterweight already agreed on: each story is finite, ends, says so, and the next one is announced. See `02-system-v0.md` §7.5.
+**The reading should feel infinite.** That is the goal the rest of this file serves. The counterweight, now in place: a story is four paragraphs, it ends, it says so, and the next one is announced. See `02-system-v0.md` §7.5 and §7.6.
 
 ---
 
-## 2. How long is a story — the vertical limit
-
-A cap on paragraphs per story. Two candidates:
-
-| Cap | Lines | Different hands |
-|---|---|---|
-| 5 paragraphs | 25 | **25 people** |
-| 3 paragraphs | 15 | **15 people** |
-
-Since a paragraph is five lines by five different hands, the cap is also a headcount: a story is a fixed number of strangers. Leaning towards **3**.
-
----
-
-## 3. How wide is a fork — the horizontal limit
-
-Two branches is probably too few. How many is open.
-
-- For building examples: **up to 5 horizontal versions of the same paragraph**, with different lengths — 3, 4 and 5 lines — to see how it reads.
-- As a starting hypothesis: **3 and 3**, the same cap on both axes.
-
-**The last horizontal slot should be empty**, so that reaching the end of the versions is itself the invitation to write one.
-
----
-
-## 4. The like — per paragraph
+## 2. The like — per paragraph
 
 Wanted. The shape:
 
@@ -45,19 +21,36 @@ Wanted. The shape:
 
 *Note, so the decision is visible when it gets taken:* this amends non-negotiable rule 4 (no likes, no votes) and displaces the canon rule in §4, which today is subtree weight — turns spent, not thumbs. Both would then be competing signals and one has to win. Worth deciding explicitly rather than by accident.
 
+**Next up.**
+
 ---
 
-## 5. How you contribute
+## 3. Branching from a line
 
-Four shapes on the table. They are not exclusive.
+One shape still on the table and not built: you pick the line inside a paragraph you liked most, that line becomes line zero of a branch, and you start a new paragraph from it.
 
-1. **Downward, into an open paragraph.** Add your line to the last paragraph while it has room. *(Already built.)*
-2. **Downward, into a new paragraph.** If the last paragraph is full, your line opens the next one. *(Already built.)*
-3. **Branch from a line.** You pick the line inside a paragraph you liked most; that line becomes line zero of the branch, and you start a new paragraph from it.
-4. **Branch from scratch.** ← *the one that felt right.* When you finish reading a paragraph that already has five lines, you can create a new one from zero: you fork, and you write your line.
-5. **Sideways, into a short version.** While scrolling horizontally, any paragraph with fewer than five lines can take your line — within your credits.
+It is a different act from what exists now. Today a version is an alternative to a whole paragraph; this would be an alternative that quotes one line and departs from it. Diagram 2 called it *"somebody decided to start with one of the lines"*, and read it as the seed of a new story rather than a version of this one — which, if taken seriously, would make stories strictly linear and remove canon altogether. That thread is still open.
 
-Options 4 and 5 together mean the horizontal axis stops being read-only: it becomes where you both explore and write.
+---
+
+## 4. Numbers that are provisional, not settled
+
+- **Four paragraphs per story.** Chosen for now over 3 (15 people) and 5 (25 people). Worth revisiting once there is enough text to read a whole one.
+- **No cap on versions per paragraph.** The horizontal axis is open-ended on purpose; if it turns out to sprawl, the cap that was floated was 3.
+
+---
+
+## 5. The sample fiction no longer fits the rules
+
+The train story was written as one continuous piece of 51 lines. Under the four-paragraph cap only its first 20 lines are reachable: **31 lines and three of its five forks are now unreadable.**
+
+Three ways out, all of them authorial:
+
+1. Split it into stories of four paragraphs or fewer. Boundaries at lines 10, 25, 35 and 45 keep every fork alive, but each seam becomes an ending that was not written as one.
+2. Trim it to twenty lines and let the rest go.
+3. Rewrite the tail as separate stories that stand on their own.
+
+Not a decision code can take — rule 8.
 
 ---
 
@@ -73,13 +66,6 @@ That order matters: the like and the sideways contribution were not designed, th
 
 ---
 
-## 7. What can be built without writing any fiction
+## 7. Still needed, and only by hand
 
-So tomorrow starts with momentum:
-
-- **N branches per fork** — the engine already handles it; `kids` has never been capped at two. Only the sample data has a single branch per fork.
-- **The empty last slot** on the horizontal axis, which opens the turn.
-- **Contributing to a short version** from the horizontal axis.
-- **Caps** on both axes, once the numbers are chosen.
-
-What cannot: the alternate paragraphs themselves. Rule 8 — the AI does not write fragments. Four more versions per fork, at 3–5 lines each, have to be written by hand.
+More alternate versions, so the horizontal axis has something to show: four or so per fork, of three to five lines each. The engine takes any number now, and the blank slot at the end lets them be written from inside the product. Rule 8 — the AI does not write fragments.
