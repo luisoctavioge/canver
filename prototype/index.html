@@ -114,7 +114,12 @@
      no box and no button. It only appears on the screen you are standing on. */
   .write{ display:none; outline:none; }
   .screen.current .write{ display:inline; }
-  .write:empty::before{ content:"…"; color:var(--ink-faint); }
+  .write:empty::before{
+    content:"Continue writing";
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint);
+  }
 
   /* ---------- index ---------- */
   .item{ border-top:1px solid var(--rule); padding:22px 0; cursor:pointer; }
@@ -212,8 +217,6 @@
 
 <div class="bar mono">
   <div class="grp">
-    <button id="bRead" class="on">Read</button>
-    <button id="bIndex">Index</button>
     <button id="bTurn">Continue</button>
   </div>
   <div class="grp">
@@ -557,10 +560,13 @@
     var list = entries(), html = "";
     list.forEach(function(e, idx){
       if(e.ending){
+        /* Only offer to carry it on if the story has room left for a line. */
+        var cabe = STORIES[e.si].route.length < PARAS * LINES;
         html += '<div class="screen ending"><div class="col">' + echo(e.last)
           + '<span class="mono end">The story stopped here</span>'
-          + '<span class="acts"><button class="goOn" data-s="' + e.si + '">Continue it</button>'
-          + '<button class="another">Another story</button></span></div></div>';
+          + (cabe ? '<span class="acts"><button class="goOn" data-s="' + e.si
+                    + '">Continue it</button></span>' : "")
+          + "</div></div>";
         return;
       }
       var isFork = !!(e.parent && (e.parent.kids.length > 1 || e.parent.forkKey));
@@ -586,9 +592,6 @@
     });
     flow.innerHTML = html;
     if(typeof hand !== "undefined") hand.classList.remove("open");
-    Array.prototype.forEach.call(flow.querySelectorAll(".another"), function(b){
-      b.addEventListener("click", function(){ mode("index"); });
-    });
     /* You reached the end, so you can carry it on: the turn opens on that story. */
     Array.prototype.forEach.call(flow.querySelectorAll(".write"), function(w){
       w.addEventListener("keydown", function(ev){
@@ -773,8 +776,6 @@
     $("#reading").hidden = m !== "read";
     $("#index").hidden  = m !== "index";
     $("#turn").hidden   = m !== "turn";
-    $("#bRead").classList.toggle("on", m === "read");
-    $("#bIndex").classList.toggle("on", m === "index");
     $("#bTurn").classList.toggle("on", m === "turn");
     ["#bAuthorship","#bDrift","#spine"].forEach(function(s){
       $(s).style.visibility = m === "read" ? "visible" : "hidden";
@@ -785,9 +786,10 @@
     if(m === "turn") paintLeaves();
     window.scrollTo(0, 0);
   }
-  $("#bRead").addEventListener("click", function(){ mode("read"); });
-  $("#bIndex").addEventListener("click", function(){ mode("index"); });
-  $("#bTurn").addEventListener("click", function(){ mode("turn"); });
+  /* One door, and it swings both ways: there is nothing else to go back to. */
+  $("#bTurn").addEventListener("click", function(){
+    mode($("#turn").hidden ? "turn" : "read");
+  });
 
   function paintIndex(){
     $("#indexList").innerHTML = STORIES.map(function(h, i){
