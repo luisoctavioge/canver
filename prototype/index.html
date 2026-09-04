@@ -45,7 +45,7 @@
     min-height:100dvh;
     scroll-snap-align:start; scroll-snap-stop:always;
     position:relative; margin-left:-34px;
-    padding:76px 0 var(--reserved, 120px) 34px;
+    padding:57px 0 var(--reserved, 120px) 34px;
   }
   .screen p{ margin:0; text-wrap:pretty; }
   .col{ width:100%; }
@@ -55,7 +55,7 @@
      sentence that starts mid-way cannot be read, and half a fragment is half
      of someone's hand. */
   .before{
-    position:sticky; top:76px; z-index:2;
+    position:sticky; top:57px; z-index:2;
     background:var(--paper); padding-bottom:var(--lh);
     opacity:.4;
   }
@@ -153,14 +153,14 @@
   }
   #spine .inner{
     width:100%; max-width:var(--measure);
-    display:flex; flex-direction:column; gap:6px;
+    display:flex; flex-direction:column; gap:5px;
   }
   #spine i{
-    height:6px; width:46px; border-radius:3px; box-sizing:border-box;
+    height:3px; width:26px; border-radius:2px; box-sizing:border-box;
     background:var(--rule);
     transition:background-color .3s, width .3s, border-color .3s;
   }
-  #spine i.on{ background:var(--accent); width:62px; }
+  #spine i.on{ background:var(--accent); width:36px; }
   /* a paragraph nobody has written yet is an outline, not a bar */
   #spine i.slot{ background:none; border:1px dashed var(--ink-faint); opacity:.55; }
 
