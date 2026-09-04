@@ -114,6 +114,8 @@
      no box and no button. It only appears on the screen you are standing on. */
   .write{ display:none; outline:none; }
   .screen.current .write{ display:inline; }
+  /* el rotulo se despega del punto anterior; al escribir vuelve a ser un espacio */
+  .write.after:empty{ margin-left:.5em; }
   .write:empty::before{
     content:"Continue writing";
     font-family:"IBM Plex Mono", ui-monospace, monospace;
@@ -555,7 +557,7 @@
         + ' style="--tint:hsla(' + tinte + ',55%,.13);--tint2:hsla(' + tinte + ',55%,.34)">'
         + fr.t + "</span>";
     });
-    return s + (pluma || "") + "</p>";
+    return s + (pluma ? (p.frs.length ? " " : "") + pluma : "") + "</p>";
   }
 
   /* The echo always begins at a fragment boundary, so it reads as a whole
@@ -590,7 +592,8 @@
         && e.node.frs.length < LINES
         && !e.node.frs.some(function(fr){ return fr.a === "you"; })));
       var pluma = libre
-        ? '<span class="write" contenteditable="plaintext-only" data-i="' + idx + '"></span>'
+        ? '<span class="write' + (e.node.frs.length ? " after" : "")
+          + '" contenteditable="plaintext-only" data-i="' + idx + '"></span>'
         : "";
       /* A story that opens says so where the echo would be: there is nothing
          behind it to carry over. */
