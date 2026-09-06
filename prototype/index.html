@@ -98,21 +98,27 @@
     font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
     letter-spacing:.08em; text-transform:uppercase;
   }
-  /* the mark only says that this moment has another version. It sits beside the
-     paragraph, not the screen, so it stays put now that screens are top-aligned */
-  .screen.fork > .col > p{ position:relative; }
-  .screen.fork > .col > p::before{
-    content:"*"; position:absolute; left:-34px; top:0;
-    width:22px; text-align:right; color:var(--ink-faint);
-    font-size:13px; line-height:var(--lh); transition:color .3s;
-  }
-  .screen.fork.current > .col > p::before{ color:var(--accent); }
   .screen.alt > .col > p{ color:var(--ink-soft); }
   /* Backed by you. Outline when it is not, filled when it is, and never a
      number: you see what you gave, not how many gave it. It is also the way
      in — the double tap works, but a heart says so without being explained. */
+  /* Arriba del párrafo: a la izquierda en qué versión del momento estás, a la
+     derecha si lo respaldaste. Lo del momento y lo del párrafo, separados. */
+  .head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:6px; min-height:16px;
+  }
+  .versions{ display:flex; gap:7px; align-items:center; }
+  .versions i{
+    width:7px; height:7px; border-radius:50%; box-sizing:border-box;
+    background:var(--rule); transition:background-color .3s, border-color .3s;
+  }
+  .versions i.on{ background:var(--accent); }
+  /* la última, punteada: esa versión no la ha escrito nadie */
+  .versions i.slot{ background:none; border:1px dotted var(--ink-faint); }
+  .versions i.slot.on{ border-color:var(--accent); }
   .heart{
-    display:block; margin-bottom:6px; padding:0; border:0; background:none;
+    padding:0; border:0; background:none;
     color:var(--accent); cursor:pointer; font-size:16px; line-height:1;
   }
   .heart:focus-visible{ outline:1px solid var(--accent); outline-offset:3px; }
@@ -345,6 +351,10 @@
      en el paso 3, con una función que gaste el turno de forma atómica. */
   var ESCRITURA = true;
 
+  /* Cinco versiones por momento. Mientras quede sitio hay una vacía al final;
+     cuando están las cinco, ya no. El eje horizontal deja de ser infinito. */
+  var VERSIONS = 5;
+
   /* El árbol se arma desde los fragmentos, que es como vive en la base: cada
      uno con su padre. Un párrafo son cinco fragmentos seguidos por un mismo
      camino, y los hijos del quinto son las versiones del párrafo siguiente —
@@ -368,7 +378,6 @@
       n.ultimo = frs[frs.length - 1].id;
       n.likes = h.likes[primero.id] || 0;
       (porPadre[n.ultimo] || []).forEach(function(kid){ n.kids.push(parrafo(kid)); });
-      if(n.kids.length > 1) n.forkKey = n.ultimo;
       n.kids.sort(function(a, b){ return b.likes - a.likes; });
       return n;
     }
@@ -434,7 +443,7 @@
       else if(state.choices[key] != null) pick = state.choices[key];
       /* Past the last version there is an empty one: reaching the end of the
          versions is itself the invitation to write the next. */
-      if(pick === "blank" && n.forkKey){
+      if(pick === "blank" && n.kids.length && n.kids.length < VERSIONS){
         route.push({ blank:true, frs:[], kids:[], from:-1, id:"b" + n.id, host:n });
         break;
       }
@@ -512,8 +521,20 @@
   function render(){
     var list = entries(), html = "";
     list.forEach(function(e, idx){
-      var isFork = !!(e.parent && (e.parent.kids.length > 1 || e.parent.forkKey));
-      var isAlt = isFork && !e.node.blank && e.parent.kids.indexOf(e.node) > 0;
+      /* Los puntos dicen en qué versión de este momento estás. El último, si
+         queda sitio, va punteado: es la que puedes escribir tú. */
+      var hermanos = e.parent ? e.parent.kids : [];
+      var hueco = hermanos.length > 0 && hermanos.length < VERSIONS;
+      var cual = e.node.blank ? hermanos.length : hermanos.indexOf(e.node);
+      var puntos = "";
+      if(hermanos.length > 1 || hueco){
+        for(var d = 0; d < hermanos.length + (hueco ? 1 : 0); d++){
+          puntos += '<i class="' + (d === hermanos.length ? "slot " : "")
+            + (d === cual ? "on" : "") + '"></i>';
+        }
+        puntos = '<span class="versions">' + puntos + "</span>";
+      }
+      var isAlt = !e.node.blank && cual > 0;
       /* You write where the line would go, in the same type as everything else:
          no second screen, no field, no counter. A blank version takes a first
          line, a short one takes the next. */
@@ -538,9 +559,12 @@
       var corazon = e.node.blank ? ""
         : '<button class="heart" data-i="' + idx + '">'
           + (mio ? "♥" : "♡") + "</button>";
-      html += '<div class="screen' + (isFork ? " fork" : "") + (isAlt ? " alt" : "")
+      html += '<div class="screen' + (isAlt ? " alt" : "")
         + (e.node.blank ? " blank" : "") + (mio ? " liked" : "") + '">'
-        + '<div class="col">' + arriba + corazon
+        + '<div class="col">' + arriba
+        + ((puntos || corazon)
+            ? '<div class="head">' + (puntos || "<span></span>") + corazon + "</div>"
+            : "")
         + (e.node.blank ? "<p>" + pluma + "</p>" : paraHTML(e.node, false, pluma))
         + "</div></div>";
     });
@@ -631,7 +655,7 @@
     var parent = e.parent;
     if(parent.kids.length < 2) return;
     var kids = parent.kids;
-    var vueltas = parent.forkKey ? kids.length + 1 : kids.length;
+    var vueltas = kids.length + (kids.length < VERSIONS ? 1 : 0);
     var current = e.node.blank ? kids.length : kids.indexOf(e.node);
     var sig = (current + 1) % vueltas;
     state.choices[at(e.pos, parent)] = sig === kids.length ? "blank" : kids[sig].id;
