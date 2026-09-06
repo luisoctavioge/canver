@@ -527,7 +527,7 @@
       var route = routeOf(si, s);
       route.forEach(function(n, k){
         out.push({ si:si, pos:s, k:k, of:route.length, node:n,
-                   parent: k > 0 ? route[k - 1] : null, opens: k === 0 && s > 0 });
+                   parent: k > 0 ? route[k - 1] : null, opens: k === 0 });
       });
     });
     return out;
@@ -581,8 +581,8 @@
         ? '<span class="write' + (e.node.frs.length ? " after" : "")
           + '" contenteditable="plaintext-only" data-i="' + idx + '"></span>'
         : "";
-      /* A story that opens says so where the echo would be: there is nothing
-         behind it to carry over. */
+      /* Every story that opens says so where the echo would be, the first one
+         included: there is nothing behind it to carry over. */
       var arriba = e.parent ? echo(e.parent)
         : (e.opens ? '<span class="mono opening">A new story</span>' : "");
       var mio = state.liked[e.si + ":" + e.node.likeKey];
