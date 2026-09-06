@@ -156,8 +156,18 @@
   }
   #spine .inner{
     width:100%; max-width:var(--measure);
-    display:flex; flex-direction:column; gap:5px;
+    display:flex; justify-content:space-between; align-items:flex-start;
   }
+  #spine .bars{ display:flex; flex-direction:column; gap:5px; }
+  /* Saving keeps the story, not the paragraph: it lives with the spine, which
+     is the only thing on screen that belongs to the story as a whole. */
+  .mark{
+    background:none; border:0; padding:0; cursor:pointer;
+    color:var(--accent); line-height:0;
+  }
+  .mark svg path{ fill:none; stroke:currentColor; stroke-width:1.4; }
+  .mark.on svg path{ fill:currentColor; }
+  .mark:focus-visible{ outline:1px solid var(--accent); outline-offset:3px; }
   #spine i{
     height:3px; width:16px; border-radius:2px; box-sizing:border-box;
     background:var(--rule);
@@ -219,7 +229,7 @@
   </div>
 </main>
 
-<div id="spine"><div class="inner"></div></div>
+<div id="spine"><div class="inner"><div class="bars"></div><button id="mark" class="mark" title="Save this story"><svg viewBox="0 0 14 18" width="14" height="18" aria-hidden="true"><path d="M1.6 1.6h10.8v14.8l-5.4-4.4-5.4 4.4z" stroke-linejoin="round"/></svg></button></div></div>
 
 <div class="bar mono">
   <div class="grp">
@@ -365,7 +375,7 @@
   });
 
   var state = { story:0, chain:[0], authorship:false, drift:false, rolls:{}, turns:3,
-                 pickedLeaf:null, fresh:null, choices:{}, liked:{} };
+                 pickedLeaf:null, fresh:null, choices:{}, liked:{}, saved:{} };
 
   var $ = function(s){ return document.querySelector(s); };
   var flow = $("#flow"), root = document.documentElement;
@@ -659,7 +669,8 @@
 
   /* Where you are inside the story you are reading, out of its five paragraphs. */
   function paintSpine(e){
-    var d = $("#spine .inner"), html = "";
+    var d = $("#spine .bars"), html = "";
+    $("#mark").classList.toggle("on", !!(e && state.saved[e.si]));
     var en = e ? e.k : -1, hay = e ? e.of : 0;
     for(var i = 0; i < PARAS; i++){
       var c = i === en ? "on" : (i < hay ? "" : "slot");
@@ -773,6 +784,15 @@
     if(!e || e.node.blank) return;
     toggleLike(e);
   }
+
+  /* The bookmark belongs to the story you are standing in, whichever that is. */
+  $("#mark").addEventListener("click", function(){
+    var e = entries()[currentIndex()];
+    if(!e) return;
+    if(state.saved[e.si]) delete state.saved[e.si];
+    else state.saved[e.si] = 1;
+    this.classList.toggle("on", !!state.saved[e.si]);
+  });
 
   flow.addEventListener("dblclick", function(ev){
     if(ev.target.closest(".heart")) return;
