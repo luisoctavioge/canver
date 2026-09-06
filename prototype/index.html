@@ -701,7 +701,7 @@
     goToScreen(k);
   }
 
-  var tX = 0, tY = 0, touching = false;
+  var tX = 0, tY = 0, touching = false, ultimoToque = {};
   window.addEventListener("touchstart", function(e){
     if($("#reading").hidden || e.touches.length !== 1) return;
     touching = true; tX = e.touches[0].clientX; tY = e.touches[0].clientY;
@@ -710,7 +710,18 @@
     if(!touching) return;
     touching = false;
     var t = e.changedTouches[0], dx = t.clientX - tX, dy = t.clientY - tY;
-    if(dx < -60 && -dx > Math.abs(dy) * 1.6) nextVersion();
+    if(dx < -60 && -dx > Math.abs(dy) * 1.6){ nextVersion(); return; }
+    /* A tap that did not move: two of them in a row back the paragraph. The
+       browser's own dblclick is unreliable on touch — it competes with
+       double-tap-to-zoom — so the two taps get counted here. */
+    if(Math.abs(dx) > 12 || Math.abs(dy) > 12) return;
+    var ahora = Date.now(), donde = t.target && t.target.closest && t.target.closest(".screen");
+    if(donde && donde === ultimoToque.donde && ahora - ultimoToque.cuando < 340){
+      ultimoToque = {};
+      likeEnPantalla(donde);
+      return;
+    }
+    ultimoToque = { donde: donde, cuando: ahora };
   }, {passive:true});
 
   var lastSide = 0;
@@ -759,14 +770,17 @@
     window.scrollTo(0, y);
   }
 
-  flow.addEventListener("dblclick", function(ev){
-    var sc = ev.target.closest(".screen");
-    if(!sc) return;
+  function likeEnPantalla(sc){
     var ps = screens(), idx = -1;
     for(var i = 0; i < ps.length; i++) if(ps[i] === sc) idx = i;
     var e = entries()[idx];
     if(!e || e.ending || e.node.blank) return;
     toggleLike(e);
+  }
+
+  flow.addEventListener("dblclick", function(ev){
+    var sc = ev.target.closest(".screen");
+    if(sc) likeEnPantalla(sc);
   });
 
   /* With authorship on, tapping a fragment tells you whose hand that is. */
