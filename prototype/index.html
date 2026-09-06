@@ -249,7 +249,7 @@
   </div>
   <div class="grp">
     <button id="bAuthorship">Autoría</button>
-    <button id="bDrift">Deriva</button>
+    <button id="bDrift" hidden>Deriva</button>
     <span id="turns"></span>
   </div>
 </div>
@@ -852,7 +852,7 @@
     $("#reading").hidden = m !== "read";
     $("#index").hidden  = m !== "index";
     $("#turn").hidden   = m !== "turn";
-    ["#bAuthorship","#bDrift","#spine"].forEach(function(s){
+    ["#bAuthorship","#spine"].forEach(function(s){
       $(s).style.visibility = m === "read" ? "visible" : "hidden";
     });
     root.classList.toggle("snap", m === "read");
