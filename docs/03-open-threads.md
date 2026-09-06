@@ -11,7 +11,23 @@
 
 ---
 
-## 2. Branching from a line
+## 2. Reading across languages
+
+Ruled out for now, and worth keeping the reasons because the question will come back the moment somebody outside the test wants in.
+
+A translate toggle breaks three things:
+
+1. **Every hand sounds the same.** Twenty-five fragments through one translator have one voice. Authorship mode exists so a text breaks into many hands; machine translation puts it back together into one.
+2. **The chain gets built on an approximation.** Each fragment answers the one before it. Writing while reading a translation means answering a text nobody wrote, and over twenty-five lines that error compounds.
+3. **Length moves.** Spanish to English shrinks, the other way grows by 15–20%. A hundred-character fragment becomes a hundred and twenty, and five lines stop fitting a screen.
+
+**The shape that would not break anything:** translate for reading, never for writing. You may turn on a translation to follow a story, but to continue it you have to see the original — so everyone answers the real text. In a translated view authorship mode goes off, because those voices belong to nobody.
+
+For now: **one language per test.** The first one runs in Spanish.
+
+---
+
+## 3. Branching from a line
 
 One shape still on the table and not built: you pick the line inside a paragraph you liked most, that line becomes line zero of a branch, and you start a new paragraph from it.
 
@@ -19,14 +35,14 @@ It is a different act from what exists now. Today a version is an alternative to
 
 ---
 
-## 3. Numbers that are provisional, not settled
+## 4. Numbers that are provisional, not settled
 
 - **Five paragraphs per story.** Tried at four first; put back to five so more of the sample story stays reachable. Still provisional, and 3 (15 people) is the other candidate.
 - **No cap on versions per paragraph.** The horizontal axis is open-ended on purpose; if it turns out to sprawl, the cap that was floated was 3.
 
 ---
 
-## 4. The sample fiction no longer fits the rules
+## 5. The sample fiction no longer fits the rules
 
 The train story was written as one continuous piece of 51 lines. Under the five-paragraph cap only its first 25 lines are reachable: **26 lines and two of its five forks are still unreadable.**
 
@@ -40,7 +56,7 @@ Not a decision code can take — rule 8.
 
 ---
 
-## 5. What the phone actually showed
+## 6. What the phone actually showed
 
 From testing the horizontal scroll on the device, in his words:
 
@@ -52,6 +68,6 @@ That order matters: the like and the sideways contribution were not designed, th
 
 ---
 
-## 6. Still needed, and only by hand
+## 7. Still needed, and only by hand
 
 More alternate versions, so the horizontal axis has something to show: four or so per fork, of three to five lines each. The engine takes any number now, and the blank slot at the end lets them be written from inside the product. Rule 8 — the AI does not write fragments.

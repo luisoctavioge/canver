@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -116,7 +116,7 @@
   /* el rotulo se despega del punto anterior; al escribir vuelve a ser un espacio */
   .write.after:empty{ margin-left:.5em; }
   .write:empty::before{
-    content:"Continue writing";
+    content:"Sigue escribiendo";
     font-family:"IBM Plex Mono", ui-monospace, monospace;
     font-size:11px; letter-spacing:.08em; text-transform:uppercase;
     color:var(--ink-faint);
@@ -213,30 +213,30 @@
     </section>
 
     <section id="index" hidden>
-      <span class="mono label">Open stories</span>
+      <span class="mono label">Historias abiertas</span>
       <div id="indexList"></div>
     </section>
 
     <section id="turn" hidden>
-      <span class="mono label">Choose who to continue</span>
+      <span class="mono label">Elige a quién continuar</span>
       <div id="leaves"></div>
       <div id="editor">
-        <textarea id="text" maxlength="140" placeholder="Continue…"></textarea>
-        <div class="counter mono"><span id="count">0 / 100</span><button id="send" disabled>Publish</button></div>
+        <textarea id="text" maxlength="140" placeholder="Continúa…"></textarea>
+        <div class="counter mono"><span id="count">0 / 100</span><button id="send" disabled>Publicar</button></div>
       </div>
     </section>
 
   </div>
 </main>
 
-<div id="spine"><div class="inner"><div class="bars"></div><button id="mark" class="mark" title="Save this story"><svg viewBox="0 0 14 18" width="14" height="18" aria-hidden="true"><path d="M1.6 1.6h10.8v14.8l-5.4-4.4-5.4 4.4z" stroke-linejoin="round"/></svg></button></div></div>
+<div id="spine"><div class="inner"><div class="bars"></div><button id="mark" class="mark" title="Guardar esta historia"><svg viewBox="0 0 14 18" width="14" height="18" aria-hidden="true"><path d="M1.6 1.6h10.8v14.8l-5.4-4.4-5.4 4.4z" stroke-linejoin="round"/></svg></button></div></div>
 
 <div class="bar mono">
   <div class="grp">
   </div>
   <div class="grp">
-    <button id="bAuthorship">Authorship</button>
-    <button id="bDrift">Drift</button>
+    <button id="bAuthorship">Autoría</button>
+    <button id="bDrift">Deriva</button>
     <span id="turns"></span>
   </div>
 </div>
@@ -244,7 +244,7 @@
 <div id="hand"><div class="inner">
   <p id="handName"></p>
   <span class="mono label" id="handData"></span>
-  <button id="handProfile" class="mono">View profile</button>
+  <button id="handProfile" class="mono">Ver perfil</button>
 </div></div>
 
 <script>
@@ -254,111 +254,111 @@
   var STORIES = [
     { id:"train-1",
       route:[
-        {a:"ana",t:"The last train pulled out with nobody aboard and still arrived late."},
-        {a:"bruno",t:"At the station, the stationmaster wrote the exact time in a notebook nobody had asked for."},
-        {a:"mireia",t:"He had been recording empty trains for eleven years."},
-        {a:"kai",t:"His handwriting had shrunk until four years fit on a single page."},
-        {a:"dana",t:"That night he wrote something different."},
-        {a:"dana",t:"A question."},
-        {a:"jonas",t:"What if the train does carry someone, and we are the ones who stopped being seen?"},
-        {a:"olga",t:"He shut the notebook before he could regret it."},
-        {a:"sara",t:"Outside, the snow was falling without ever reaching the ground."},
-        {a:"ruy",t:"A dog crossed the tracks in the opposite direction from usual."},
-        {a:"tavo",t:"He followed it, having nothing better to do with the insomnia."},
-        {a:"lia",t:"The dog stopped at a door he could not remember ever having seen."},
-        {a:"martin",t:"It was the door of his own house."},
-        {a:"cielo",t:"But on the wrong side of the street."},
-        {a:"isis",t:"Inside, someone had left the light on and the table set for two."},
-        {a:"nube",t:"He had been eating dinner alone for twenty years."},
-        {a:"bruno",t:"He sat down anyway, on the side that was not his."},
-        {a:"cielo",t:"The soup was warm, as if someone had just left through the other door."},
-        {a:"ana",t:"There was no other door."},
-        {a:"kai",t:"In the notebook the question was still open, and open questions have weight."},
-        {a:"dana",t:"He decided to answer it with his feet."},
-        {a:"jonas",t:"He walked back to the station over his own footprints, which were gone."},
-        {a:"olga",t:"The platform was full."},
-        {a:"mireia",t:"People in coats, holding tickets, watching a clock he had never installed."},
-        {a:"sara",t:"Not one of them made a sound."}
+        {a:"ana",t:"El último tren salió sin nadie adentro y aun así llegó tarde."},
+        {a:"bruno",t:"En la estación, el jefe anotó la hora exacta en un cuaderno que nadie le había pedido."},
+        {a:"mireia",t:"Llevaba once años anotando trenes vacíos."},
+        {a:"kai",t:"Su letra se había ido encogiendo hasta que cuatro años cabían en una página."},
+        {a:"dana",t:"Esa noche escribió algo distinto."},
+        {a:"dana",t:"Una pregunta."},
+        {a:"jonas",t:"¿Y si el tren sí lleva a alguien, y los que dejamos de ver somos nosotros?"},
+        {a:"olga",t:"Cerró el cuaderno antes de arrepentirse."},
+        {a:"sara",t:"Afuera, la nieve caía sin llegar a tocar el suelo."},
+        {a:"ruy",t:"Un perro cruzó las vías en dirección contraria a la costumbre."},
+        {a:"tavo",t:"El jefe lo siguió, porque no tenía nada mejor que hacer con el insomnio."},
+        {a:"lia",t:"El perro se detuvo frente a una puerta que él no recordaba haber visto nunca."},
+        {a:"martin",t:"Era la puerta de su casa."},
+        {a:"cielo",t:"Pero del lado equivocado de la calle."},
+        {a:"isis",t:"Adentro alguien había dejado la luz encendida y la mesa puesta para dos."},
+        {a:"nube",t:"El jefe llevaba veinte años cenando solo."},
+        {a:"bruno",t:"Se sentó igual, del lado que no era suyo."},
+        {a:"cielo",t:"La sopa estaba tibia, como si alguien acabara de salir por la otra puerta."},
+        {a:"ana",t:"No había otra puerta."},
+        {a:"kai",t:"En el cuaderno la pregunta seguía abierta, y las preguntas abiertas pesan."},
+        {a:"dana",t:"Decidió responderla con los pies."},
+        {a:"jonas",t:"Volvió a la estación pisando sus propias huellas, que ya no estaban."},
+        {a:"olga",t:"El andén estaba lleno."},
+        {a:"mireia",t:"Gente en abrigo, con boletos, mirando un reloj que él nunca había instalado."},
+        {a:"sara",t:"Ninguno hacía ruido."}
       ],
       forks:{
         5:{ branches:[[
-          {a:"ruy",t:"The notebook stayed open all night, and the snow came in to read it."},
-          {a:"dana",t:"By morning the ink had run until it formed a different question."},
-          {a:"olga",t:"Nobody ever read it, because the stationmaster never came back."}
+          {a:"ruy",t:"El cuaderno se quedó abierto toda la noche, y la nieve entró a leerlo."},
+          {a:"dana",t:"Por la mañana la tinta se había corrido hasta formar otra pregunta."},
+          {a:"olga",t:"Nadie la leyó nunca, porque el jefe no volvió a la estación."}
         ]]},
         15:{ branches:[[
-          {a:"cielo",t:"But he was no longer sure which side was his."},
-          {a:"kai",t:"He knocked, just in case, and a man with his same tired face opened it."},
-          {a:"sara",t:"Both understood at the same moment that one of them was one too many."},
-          {a:"nube",t:"Neither of them moved."}
+          {a:"cielo",t:"Pero él ya no estaba seguro de cuál lado era el suyo."},
+          {a:"kai",t:"Tocó, por si acaso, y le abrió un hombre con su misma cara cansada."},
+          {a:"sara",t:"Los dos entendieron al mismo tiempo que sobraba uno."},
+          {a:"nube",t:"Ninguno se movió."}
         ]]},
         20:{ branches:[[
-          {a:"nube",t:"The snow had erased the entire station and even so the clock kept going."},
-          {a:"martin",t:"He wrote the time in the air with a finger, because there was no notebook left."},
-          {a:"lia",t:"It was the first time in eleven years that he was on time."}
+          {a:"nube",t:"La nieve había borrado la estación entera y, aun así, el reloj seguía."},
+          {a:"martin",t:"Anotó la hora en el aire, con el dedo, porque ya no había cuaderno."},
+          {a:"lia",t:"Fue la primera vez en once años que llegó a tiempo."}
         ]]}
       }
     },
     { id:"train-2",
       route:[
-        {a:"ruy",t:"He knew every one of them: they were the hours he had recorded for eleven years."},
-        {a:"tavo",t:"A woman came over and handed back the notebook he was already holding."},
-        {a:"lia",t:"“We have been reading it,” she said. “It is the only thing that arrives on time.”"},
-        {a:"martin",t:"He wanted to ask who they were."},
-        {a:"isis",t:"He asked something else."},
-        {a:"nube",t:"“What if I get on?”"},
-        {a:"cielo",t:"Nobody answered, but every one of them stepped aside."},
-        {a:"ana",t:"The train came in empty, as always, and for the first time it looked like an invitation."},
-        {a:"bruno",t:"He boarded with the notebook under his arm, leaving the station light on."},
-        {a:"kai",t:"The doors closed with the sound of a page being turned."},
-        {a:"dana",t:"Through the window he saw the stationmaster writing down the exact time."},
-        {a:"kai",t:"He raised a hand to greet himself."},
-        {a:"jonas",t:"The carriage smelled of wet paper and of winters that had not been his."},
-        {a:"olga",t:"On every seat lay a different notebook, open at a question."},
-        {a:"mireia",t:"None of them was his."},
-        {a:"sara",t:"He understood that it was his turn to answer one."},
-        {a:"ruy",t:"He chose the shortest, because the train was not going to wait."},
-        {a:"tavo",t:"It read: “Who turns on the light in empty houses?”"},
-        {a:"lia",t:"Underneath, in his shrunken hand, he wrote: “Someone on their way.”"},
-        {a:"martin",t:"The train braked where there was no station."},
-        {a:"isis",t:"Outside there was no snow: there was November, and a street with two identical sidewalks."},
-        {a:"nube",t:"He got off."},
-        {a:"cielo",t:"The house had the table set for two and the soup still warm."},
-        {a:"ana",t:"This time he sat on his own side."},
-        {a:"bruno",t:"He left the notebook open at the page that came next."}
+        {a:"ruy",t:"Los reconoció a todos: eran las horas que había anotado durante once años."},
+        {a:"tavo",t:"Una mujer se acercó y le devolvió el cuaderno, que él llevaba en la mano."},
+        {a:"lia",t:"«Lo estuvimos leyendo», dijo. «Es lo único que llega puntual»."},
+        {a:"martin",t:"Él quiso preguntar quiénes eran."},
+        {a:"isis",t:"Preguntó otra cosa."},
+        {a:"nube",t:"«¿Y si me subo?»"},
+        {a:"cielo",t:"Nadie contestó, pero todos se hicieron a un lado."},
+        {a:"ana",t:"El tren llegó vacío, como siempre, y por primera vez eso pareció una invitación."},
+        {a:"bruno",t:"Subió con el cuaderno bajo el brazo y sin apagar la luz de la estación."},
+        {a:"kai",t:"Las puertas se cerraron con el sonido de una página al pasar."},
+        {a:"dana",t:"Por la ventana vio al jefe de estación anotando la hora exacta."},
+        {a:"kai",t:"Levantó la mano para saludarse."},
+        {a:"jonas",t:"El vagón olía a papel mojado y a inviernos que no le habían tocado."},
+        {a:"olga",t:"En cada asiento había un cuaderno distinto, abierto en una pregunta."},
+        {a:"mireia",t:"Ninguna era la suya."},
+        {a:"sara",t:"Entendió que le tocaba contestar una."},
+        {a:"ruy",t:"Escogió la más corta, porque el tren no iba a esperar."},
+        {a:"tavo",t:"Decía: «¿Quién enciende la luz de las casas vacías?»"},
+        {a:"lia",t:"Escribió debajo, con su letra encogida: «Alguien que va llegando»."},
+        {a:"martin",t:"El tren frenó sin estación."},
+        {a:"isis",t:"Afuera no había nieve: había noviembre, y una calle con dos aceras iguales."},
+        {a:"nube",t:"Bajó."},
+        {a:"cielo",t:"La casa tenía la mesa puesta para dos y la sopa tibia."},
+        {a:"ana",t:"Esta vez se sentó del lado suyo."},
+        {a:"bruno",t:"Dejó el cuaderno abierto en la página que seguía."}
       ],
       forks:{
         5:{ branches:[[
-          {a:"sara",t:"“Nobody gets on,” said the woman. “You stay until the train takes you.”"},
-          {a:"jonas",t:"He looked at the crowded platform and counted: eleven years, eleven winters."},
-          {a:"isis",t:"He stayed, and went on recording, no longer alone."}
+          {a:"sara",t:"«Nadie se sube», dijo la mujer. «Uno se queda hasta que el tren se lo lleva»."},
+          {a:"jonas",t:"Él miró el andén lleno y contó: once años, once inviernos, once trenes."},
+          {a:"isis",t:"Se quedó, y siguió anotando, ahora acompañado."}
         ]]},
         15:{ branches:[[
-          {a:"isis",t:"He answered none of them: he wrote a new one and left it open for the next."},
-          {a:"bruno",t:"The whole carriage turned the page at the same time."},
-          {a:"ana",t:"And the train went on, with no destination now, collecting questions."}
+          {a:"isis",t:"No contestó ninguna: escribió una nueva y la dejó abierta para el siguiente."},
+          {a:"bruno",t:"El vagón entero pasó la página al mismo tiempo."},
+          {a:"ana",t:"Y el tren siguió, ya sin destino, recogiendo preguntas."}
         ]]}
       }
     },
     { id:"train-3",
       route:[
-        {a:"kai",t:"And he waited, in no hurry, for someone else to arrive late."}
+        {a:"kai",t:"Y esperó, sin apuro, a que alguien más llegara tarde."}
       ],
       forks:{}
     },
     { id:"library",
       route:[
-        {a:"olga",t:"The library closed in 1994 and went on receiving returns."},
-        {a:"ruy",t:"The books turned up in the drop box with no sender, always in good condition."},
-        {a:"dana",t:"Someone was reading them with a care that has gone out of fashion."},
-        {a:"lia",t:"The librarian was never replaced: he simply stopped growing older."}
+        {a:"olga",t:"La biblioteca cerró en 1994 y siguió recibiendo devoluciones."},
+        {a:"ruy",t:"Los libros aparecían en el buzón sin remitente, siempre en buen estado."},
+        {a:"dana",t:"Alguien los leía con un cuidado que ya no se estila."},
+        {a:"lia",t:"El bibliotecario nunca fue reemplazado: simplemente dejó de envejecer."}
       ], forks:{}
     },
     { id:"salt",
       route:[
-        {a:"mireia",t:"My grandmother kept the salt in a jar labelled as something else."},
-        {a:"tavo",t:"She said that way the salt never found out it was salt, and lasted longer."},
-        {a:"ana",t:"When she died we found fourteen jars and not one correct label."}
+        {a:"mireia",t:"Mi abuela guardaba la sal en un frasco con la etiqueta de otra cosa."},
+        {a:"tavo",t:"Decía que así la sal no se enteraba de que era sal y duraba más."},
+        {a:"ana",t:"Cuando murió encontramos catorce frascos y ninguna etiqueta correcta."}
       ], forks:{}
     }
   ];
@@ -368,7 +368,7 @@
   /* Placeholder pronouns, cycled through the list on purpose: a name does not
      tell you anyone's pronoun, each person tells you their own. In the real
      product this is something people set on their own profile. */
-  var PRONOUNS = ["she", "he", "they"];
+  var PRONOUNS = ["ella", "él", "elle"];
   var PROFILES = {};
   Object.keys(TINTS).forEach(function(a, i){
     if(a !== "you") PROFILES[a] = { pron: PRONOUNS[i % PRONOUNS.length] };
@@ -460,11 +460,15 @@
     }
     STORIES.forEach(function(h){
       h.route.forEach(function(fr, i){
-        note(fr.a, (i + 1 < h.route.length ? 1 : 0) + (h.forks[i + 1] ? 1 : 0));
+        var nudo = h.forks[i + 1];
+        note(fr.a, (i + 1 < h.route.length ? 1 : 0) + (nudo ? nudo.branches.length : 0));
       });
+      /* Un nudo tiene una lista de versiones, no una sola rama. Cada versión
+         que nace de un fragmento cuenta como una continuación suya. */
       Object.keys(h.forks).forEach(function(k){
-        var r = h.forks[k].branch;
-        r.forEach(function(fr, j){ note(fr.a, j + 1 < r.length ? 1 : 0); });
+        h.forks[k].branches.forEach(function(br){
+          br.forEach(function(fr, j){ note(fr.a, j + 1 < br.length ? 1 : 0); });
+        });
       });
     });
     return hands;
@@ -600,7 +604,7 @@
       /* Every story that opens says so where the echo would be, the first one
          included: there is nothing behind it to carry over. */
       var arriba = e.parent ? echo(e.parent)
-        : (e.opens ? '<span class="mono opening">A new story</span>' : "");
+        : (e.opens ? '<span class="mono opening">Una historia nueva</span>' : "");
       var mio = state.liked[e.si + ":" + e.node.likeKey];
       var corazon = e.node.blank ? ""
         : '<button class="heart" data-i="' + idx + '">'
@@ -822,11 +826,11 @@
 
     var a = el.dataset.a, m = census()[a] || { fragments:0, fecundity:0 };
     var pron = a === "you" ? "" : (PROFILES[a] || {}).pron;
-    $("#handName").textContent = a === "you" ? "you" : a;
+    $("#handName").textContent = a === "you" ? "tú" : a;
     $("#handName").style.color = "hsl(" + (TINTS[a] || "0,0%") + ",58%)";
     $("#handData").textContent = (pron ? pron + " · " : "")
-      + plural(m.fragments, "fragment", "fragments") + " · "
-      + plural(m.fecundity, "continuation", "continuations");
+      + plural(m.fragments, "fragmento", "fragmentos") + " · "
+      + plural(m.fecundity, "continuación", "continuaciones");
     hand.classList.add("open");
   }
 
@@ -877,9 +881,9 @@
       var forks = Object.keys(h.forks).length;
       return '<div class="item" tabindex="0" data-h="' + i + '">'
         + '<span class="opens">' + h.route[0].t + "</span>"
-        + '<span class="meta mono">' + plural(h.route.length, "fragment", "fragments")
-        + " · " + plural(Object.keys(who).length, "hand", "hands")
-        + (forks ? " · " + plural(forks, "fork", "forks") : "") + "</span></div>";
+        + '<span class="meta mono">' + plural(h.route.length, "fragmento", "fragmentos")
+        + " · " + plural(Object.keys(who).length, "mano", "manos")
+        + (forks ? " · " + plural(forks, "bifurcación", "bifurcaciones") : "") + "</span></div>";
     }).join("");
     Array.prototype.forEach.call($("#indexList").querySelectorAll(".item"), function(el){
       var openStory = function(){
@@ -898,7 +902,7 @@
     var cont = $("#leaves");
 
     if(state.turns <= 0){
-      cont.innerHTML = '<p class="empty">No turns left. They come back Monday.</p>';
+      cont.innerHTML = '<p class="empty">Sin turnos. Vuelven el lunes.</p>';
       $("#editor").classList.remove("open");
       return;
     }
@@ -906,9 +910,9 @@
       var n = h.route.length, llenas = openLines(h);
       var parent = n > 1 ? h.route[n-2].t : "";
       var tuya = alreadyYours(h);
-      var estado = tuya ? "your line is already in this paragraph"
-        : llenas === LINES ? "opens a new paragraph"
-        : "line " + (llenas + 1) + " of " + LINES;
+      var estado = tuya ? "tu línea ya está en este párrafo"
+        : llenas === LINES ? "abre un párrafo nuevo"
+        : "línea " + (llenas + 1) + " de " + LINES;
       return '<div class="leafrow' + (tuya ? " taken" : "") + '" tabindex="0" data-h="' + i + '">'
         + (parent ? '<span class="parent">' + parent + "</span> " : "")
         + '<span class="leaf">' + h.route[n-1].t + "</span>"
@@ -987,7 +991,7 @@
   });
 
   function updateTurns(){
-    $("#turns").textContent = state.turns + (state.turns === 1 ? " turn" : " turns");
+    $("#turns").textContent = state.turns + (state.turns === 1 ? " turno" : " turnos");
   }
 
   updateTurns();

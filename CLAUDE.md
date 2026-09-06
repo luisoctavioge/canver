@@ -25,7 +25,7 @@ If any of these breaks, it stops being Canver and turns into one more social net
 5. **When writing you see two fragments; when reading you see everything.** A translation of the Japanese renga rule (*link and shift*). It produces local coherence and global drift.
 6. **Reading has two axes, and it does not stop.** Vertical is the time of the story: one paragraph per screen, from beginning to end, and when a story ends the next one follows if you keep scrolling. Horizontal is the other versions of that same moment. No cards, no avatars, no timestamps, no counters. *(Revised 04-sep-2026: the scroll is now endless, which this rule used to forbid. What keeps it from being a feed is that each story is finite and that the one that follows announces itself — never served silently. *(05-sep-2026: the closing screen is gone. Reaching the last paragraph, the next scroll opens the next story, so the boundary is now carried entirely by that announcement.)* A cap on paragraphs per story is what makes that true; it is still to be defined.)* The seam between fragments is a space, never a visible line.
 7. **Authorship is off by default.** First you read a text; then, if you turn on authorship mode, you watch it break into many hands, and tapping a fragment tells you whose it is. That revelation is the emotional moment of the product and it burns out if authorship is visible all the time.
-8. **AI does not write fragments.** It would destroy scarcity, which is the entire asset of the system. *(Amended 03-sep-2026 for the prototype only: the sample fiction was translated into English on the owner's explicit instruction. The rule stands for the product.)*
+8. **AI does not write fragments.** It would destroy scarcity, which is the entire asset of the system. *(It was amended on 03-sep-2026 to translate the sample fiction into English on the owner's explicit instruction; on 05-sep-2026 the original Spanish was restored word for word from the translation table, so no machine-written text is left in the corpus. The rule stands.)*
 
 ---
 
@@ -42,7 +42,8 @@ If any of these breaks, it stops being Canver and turns into one more social net
 | Media | **Text only in the MVP** | Image, audio, code and video come later. |
 | Typography | **IBM Plex Sans** (reading) + **IBM Plex Mono** (apparatus) | One superfamily, two roles. 18px on a 32px grid. |
 | Sustaining it | Subscription, not advertising | Advertising breaks the attention economy of the product. |
-| Language | **English**, in the product and the documentation | *(Changed 03-sep-2026. It used to be Spanish.)* |
+| Language | **Spanish in the product, English in the docs** | One language at a time, never two: the first test runs with Spanish-speaking friends, so the product speaks Spanish. *(05-sep-2026. It went English on 03-sep and came back; the documentation stayed English, since nobody outside the project reads it.)* |
+| Translation | **None** | A machine translation would give twenty-five hands a single voice, and the chain would be built on a text nobody wrote. If it ever comes, it is for reading only — never for writing. |
 
 ---
 
@@ -105,7 +106,7 @@ DIAGRAM 2.png           stories chained in one stream, still to be designed
 
 ## How to work here
 
-- **Language:** English, in the product and in the documentation.
+- **Language:** Spanish in the product, English in these documents. One language at a time — mixing them is what the translation decision rules out.
 - **Before proposing a feature**, check that it does not break the non-negotiable rules or the "what NOT to do" list.
 - **Before building**, read `docs/02-system-v0.md`. `docs/01-references.md` explains why each decision is the way it is, and what killed the predecessors (Ficlets, Ficly, FoldingStory, Branch): none of them died of the concept, all of them died of infrastructure and maintenance.
 - **The prototype is edited in its own file**, not rewritten from scratch.
