@@ -71,6 +71,8 @@ docs/01-references.md   map of references and what to learn from each
 docs/02-system-v0.md    the whole system: primitives, economy, visual layer
 docs/03-open-threads.md what is still being thought through, nothing decided
 prototype/index.html    static prototype, one file, no dependencies
+db/01-schema.sql        tables and row policies for the shared database
+db/02-seed.sql          the five stories as rows, generated from the prototype
 DIAGRAM 1.png           the reading model as it stands
 DIAGRAM 2.png           stories chained in one stream, still to be designed
 ```
