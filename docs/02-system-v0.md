@@ -43,7 +43,7 @@ Local coherence plus global drift. It is the direct answer to what went wrong in
 
 | Rule | Starting value | Reason |
 |---|---|---|
-| Turns per period | 3 a week | Enough to have judgement, too few to make noise. Weekly avoids streak anxiety. |
+| Turns per period | 1 a day | Enough to have judgement, too few to make noise. *(Was 3 a week until 05-sep-2026.)* They are not handed out by a nightly job: each person collects what they are owed the next time they show up, so there is no scheduler to maintain. |
 | Accumulation cap | 5 | You can save, not hoard. |
 | Cost of continuing | 1 turn | The default action is the cheapest one. |
 | Cost of seeding | 3 turns, unlocked after N continuations | **You earn the right to start by having continued.** Without this, everybody seeds and nobody continues. |

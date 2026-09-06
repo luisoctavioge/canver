@@ -1010,13 +1010,13 @@
     pedir("/fragments?select=id,story_id,parent_id,author_id,text,created_at&order=created_at"),
     pedir("/likes?select=person_id,paragraph_id"),
     pedir("/bookmarks?select=story_id&person_id=eq." + encodeURIComponent(YO)),
-    pedir("/people?select=id,turns&id=eq." + encodeURIComponent(YO))
+    mandar("POST", "/rpc/refresh_turns", { p_person: YO })
   ]).then(function(res){
     var historias = res[0], fragmentos = res[1], respaldos = res[2];
-    var guardadas = res[3], quienSoy = res[4];
+    var guardadas = res[3], misTurnos = res[4];
 
-    if(!quienSoy.length) throw new Error("no existe la persona '" + YO + "'");
-    state.turns = quienSoy[0].turns;
+    /* Un turno al día: la base los cobra al aparecer, no un reloj nocturno. */
+    state.turns = typeof misTurnos === "number" ? misTurnos : 0;
     updateTurns();
 
     var cuenta = {};
