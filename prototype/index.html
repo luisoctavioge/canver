@@ -100,8 +100,14 @@
   }
   .screen.fork.current > .col > p::before{ color:var(--accent); }
   .screen.alt > .col > p{ color:var(--ink-soft); }
-  /* backed by you: a printer's mark, never a number */
-  .backed{ color:var(--accent); font-size:.55em; vertical-align:.28em; }
+  /* Backed by you. Outline when it is not, filled when it is, and never a
+     number: you see what you gave, not how many gave it. It is also the way
+     in — the double tap works, but a heart says so without being explained. */
+  .heart{
+    display:block; margin-bottom:6px; padding:0; border:0; background:none;
+    color:var(--accent); cursor:pointer; font-size:16px; line-height:1;
+  }
+  .heart:focus-visible{ outline:1px solid var(--accent); outline-offset:3px; }
   .opening{ color:var(--ink-faint); display:block; padding-bottom:var(--lh); }
   /* Writing is reading with a caret in it: same type, same size, same colour,
      no box and no button. It only appears on the screen you are standing on. */
@@ -586,10 +592,12 @@
       var arriba = e.parent ? echo(e.parent)
         : (e.opens ? '<span class="mono opening">A new story</span>' : "");
       var mio = state.liked[e.si + ":" + e.node.likeKey];
-      if(mio) pluma = '<span class="backed">●</span>' + pluma;
+      var corazon = e.node.blank ? ""
+        : '<button class="heart" data-i="' + idx + '">'
+          + (mio ? "♥" : "♡") + "</button>";
       html += '<div class="screen' + (isFork ? " fork" : "") + (isAlt ? " alt" : "")
         + (e.node.blank ? " blank" : "") + (mio ? " liked" : "") + '">'
-        + '<div class="col">' + arriba
+        + '<div class="col">' + arriba + corazon
         + (e.node.blank ? "<p>" + pluma + "</p>" : paraHTML(e.node, false, pluma))
         + "</div></div>";
     });
@@ -702,6 +710,7 @@
        browser's own dblclick is unreliable on touch — it competes with
        double-tap-to-zoom — so the two taps get counted here. */
     if(Math.abs(dx) > 12 || Math.abs(dy) > 12) return;
+    if(t.target && t.target.closest && t.target.closest(".heart")) return;
     var ahora = Date.now(), donde = t.target && t.target.closest && t.target.closest(".screen");
     if(donde && donde === ultimoToque.donde && ahora - ultimoToque.cuando < 340){
       ultimoToque = {};
@@ -766,8 +775,17 @@
   }
 
   flow.addEventListener("dblclick", function(ev){
+    if(ev.target.closest(".heart")) return;
     var sc = ev.target.closest(".screen");
     if(sc) likeEnPantalla(sc);
+  });
+
+  flow.addEventListener("click", function(ev){
+    var h = ev.target.closest(".heart");
+    if(!h) return;
+    ev.stopPropagation();
+    var e = entries()[parseInt(h.dataset.i, 10)];
+    if(e) toggleLike(e);
   });
 
   /* With authorship on, tapping a fragment tells you whose hand that is. */

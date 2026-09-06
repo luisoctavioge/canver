@@ -63,7 +63,7 @@ Every fork gets **resolved**: somebody decides which branch the reading follows.
 
 ### Canon — resolved by the likes
 
-At every fork the winner is the version with **the most likes on its paragraph**. A double tap backs one. No count is shown anywhere: you see which version won, never by how much.
+At every fork the winner is the version with **the most likes on its paragraph**. A heart above each paragraph shows whether you backed it — outline if not, filled if so — and either tapping it or double-tapping the paragraph backs it. No count is shown anywhere: you see what you gave, never how many gave it.
 
 *(Revised 05-sep-2026. It used to be subtree weight — the branch with the most accumulated fragments, each one a turn somebody spent. That was unfalsifiable and paid for; the like is free. What made the change worth it is that the like came from reading, not from theory: swiping through versions of the same moment, some of them make you want to back them.)*
 
