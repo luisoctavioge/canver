@@ -103,15 +103,6 @@
   /* backed by you: a printer's mark, never a number */
   .backed{ color:var(--accent); font-size:.55em; vertical-align:.28em; }
   .opening{ color:var(--ink-faint); display:block; padding-bottom:var(--lh); }
-  .ending{ color:var(--ink-faint); }
-  .end{ display:block; margin-bottom:16px; }
-  .acts{ display:flex; gap:24px; flex-wrap:wrap; }
-  .acts button{
-    background:none; border:0; padding:0; cursor:pointer; color:var(--accent);
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
-    letter-spacing:.08em; text-transform:uppercase;
-  }
-  .acts button:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
   /* Writing is reading with a caret in it: same type, same size, same colour,
      no box and no button. It only appears on the screen you are standing on. */
   .write{ display:none; outline:none; }
@@ -136,7 +127,9 @@
     display:flex; align-items:center; justify-content:space-between; gap:14px 20px;
     flex-wrap:wrap; padding:18px 24px calc(22px + env(safe-area-inset-bottom));
     color:var(--ink-faint);
-    position:sticky; bottom:0; z-index:5; background:var(--paper);
+    /* fija, no pegajosa: en el telefono la barra de direcciones aparece y
+       desaparece al hacer scroll, y una barra sticky se despega del borde */
+    position:fixed; left:0; right:0; bottom:0; z-index:5; background:var(--paper);
   }
   .grp{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
   .bar button{
@@ -536,7 +529,6 @@
         out.push({ si:si, pos:s, k:k, of:route.length, node:n,
                    parent: k > 0 ? route[k - 1] : null, opens: k === 0 && s > 0 });
       });
-      out.push({ si:si, ending:true, of:route.length, last: route[route.length - 1] });
     });
     return out;
   }
@@ -573,11 +565,6 @@
   function render(){
     var list = entries(), html = "";
     list.forEach(function(e, idx){
-      if(e.ending){
-        html += '<div class="screen ending"><div class="col">' + echo(e.last)
-          + '<span class="mono end">The story stopped here</span></div></div>';
-        return;
-      }
       var isFork = !!(e.parent && (e.parent.kids.length > 1 || e.parent.forkKey));
       var isAlt = isFork && !e.node.blank && e.parent.kids.indexOf(e.node) > 0;
       /* You write where the line would go, in the same type as everything else:
@@ -665,7 +652,7 @@
   /* Where you are inside the story you are reading, out of its five paragraphs. */
   function paintSpine(e){
     var d = $("#spine .inner"), html = "";
-    var en = e && !e.ending ? e.k : -1, hay = e ? e.of : 0;
+    var en = e ? e.k : -1, hay = e ? e.of : 0;
     for(var i = 0; i < PARAS; i++){
       var c = i === en ? "on" : (i < hay ? "" : "slot");
       html += '<i class="' + c + '"></i>';
@@ -688,7 +675,7 @@
      one you come back to the canon. */
   function nextVersion(){
     var list = entries(), k = currentIndex(), e = list[k];
-    if(!e || e.ending || !e.parent) return;
+    if(!e || !e.parent) return;
     var parent = e.parent;
     if(parent.kids.length < 2) return;
     var kids = parent.kids;
@@ -774,7 +761,7 @@
     var ps = screens(), idx = -1;
     for(var i = 0; i < ps.length; i++) if(ps[i] === sc) idx = i;
     var e = entries()[idx];
-    if(!e || e.ending || e.node.blank) return;
+    if(!e || e.node.blank) return;
     toggleLike(e);
   }
 
