@@ -75,6 +75,14 @@
   /* in authorship mode the picked fragment deepens and names its hand below */
   #flow.authorship .f.picked{ background-color:var(--tint2); }
 
+  #aviso{
+    position:fixed; left:0; right:0; bottom:0; z-index:7;
+    padding:16px 24px calc(20px + env(safe-area-inset-bottom));
+    background:var(--paper); color:#b4553f; text-align:center;
+    transform:translateY(102%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  #aviso.on{ transform:none; }
+
   /* ---------- the hand ---------- */
   #hand{
     position:fixed; inset:auto 0 0 0; background:var(--paper);
@@ -241,6 +249,8 @@
   </div>
 </div>
 
+<div id="aviso" class="mono"></div>
+
 <div id="hand"><div class="inner">
   <p id="handName"></p>
   <span class="mono label" id="handData"></span>
@@ -258,12 +268,36 @@
   var BASE = "https://lrcxacnamtuqhitsnvbk.supabase.co/rest/v1";
   var LLAVE = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyY3hhY25hbXR1cWhpdHNudmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2OTIyNTIsImV4cCI6MjEwNDI2ODI1Mn0.D_CDYG6khu8hucB584Sl9q6Xz0qNLBqkIBEtdSZtp5I";
 
+  /* Quién eres viene en el propio link: tusitio.com/#ana. Sin registro y sin
+     contraseña. Es identidad floja a propósito —quien tenga tu link es tú—,
+     suficiente entre amigos y no para abrirlo al mundo. */
+  var YO = (location.hash || "").replace("#", "").trim() || "you";
+
+  function cabeceras(extra){
+    var h = { apikey: LLAVE, Authorization: "Bearer " + LLAVE };
+    for(var k in extra) h[k] = extra[k];
+    return h;
+  }
+
   function pedir(ruta){
-    return fetch(BASE + ruta, { headers: { apikey: LLAVE, Authorization: "Bearer " + LLAVE } })
+    return fetch(BASE + ruta, { headers: cabeceras() })
       .then(function(r){
         if(!r.ok) throw new Error(ruta + " -> " + r.status);
         return r.json();
       });
+  }
+
+  function mandar(metodo, ruta, cuerpo){
+    return fetch(BASE + ruta, {
+      method: metodo,
+      headers: cabeceras({ "Content-Type": "application/json", Prefer: "return=representation" }),
+      body: cuerpo ? JSON.stringify(cuerpo) : undefined
+    }).then(function(r){
+      return r.json().then(function(j){
+        if(!r.ok) throw new Error((j && (j.message || j.hint)) || (ruta + " -> " + r.status));
+        return j;
+      });
+    });
   }
 
   var STORIES = [];
@@ -309,7 +343,7 @@
 
   /* Paso 2: se lee de la base, todavía no se escribe en ella. Escribir vuelve
      en el paso 3, con una función que gaste el turno de forma atómica. */
-  var ESCRITURA = false;
+  var ESCRITURA = true;
 
   /* El árbol se arma desde los fragmentos, que es como vive en la base: cada
      uno con su padre. Un párrafo son cinco fragmentos seguidos por un mismo
@@ -455,7 +489,7 @@
     p.frs.forEach(function(fr, x){
       var tinte = TINTS[fr.a] || "0,0%";
       s += (x ? " " : "")
-        + '<span class="f' + (!echo && fr === state.fresh ? " fresh" : "")
+        + '<span class="f' + (!echo && fr.id && fr.id === state.fresh ? " fresh" : "")
         + (parked.indexOf(fr) >= 0 ? " dup" : "")
         + '" data-a="' + fr.a + '"'
         + ' style="--tint:hsla(' + tinte + ',55%,.13);--tint2:hsla(' + tinte + ',55%,.34)">'
@@ -657,16 +691,18 @@
 
   /* Double tap backs a paragraph. There is no count anywhere: what you see is
      not how many liked it, it is which version the likes made canon. */
+  /* El corazón se pinta de inmediato y se guarda después: el pulgar no debe
+     esperar a la red. Si la base falla, se deshace y se avisa. */
   function toggleLike(e){
     var h = STORIES[e.si], key = e.node.likeKey, mio = e.si + ":" + key;
-    h.likes = h.likes || {};
-    if(state.liked[mio]){
+    var quitando = !!state.liked[mio];
+
+    if(quitando){
       delete state.liked[mio];
       h.likes[key] = Math.max(0, (h.likes[key] || 0) - 1);
     } else {
       state.liked[mio] = 1;
       h.likes[key] = (h.likes[key] || 0) + 1;
-      /* Stay on what you just backed, even if it just became the canon. */
       var padre = e.parent;
       if(padre) state.choices[at(e.pos, padre)] = e.node.id;
     }
@@ -674,6 +710,20 @@
     var y = window.scrollY;
     render();
     window.scrollTo(0, y);
+
+    var camino = "/likes?person_id=eq." + encodeURIComponent(YO)
+      + "&paragraph_id=eq." + encodeURIComponent(key);
+    var promesa = quitando
+      ? mandar("DELETE", camino)
+      : mandar("POST", "/likes", { person_id: YO, paragraph_id: key });
+
+    promesa.catch(function(err){
+      if(quitando){ state.liked[mio] = 1; h.likes[key] = (h.likes[key] || 0) + 1; }
+      else { delete state.liked[mio]; h.likes[key] = Math.max(0, (h.likes[key] || 0) - 1); }
+      h.tree = null;
+      render();
+      avisar("No se pudo guardar: " + err.message);
+    });
   }
 
   function likeEnPantalla(sc){
@@ -688,9 +738,22 @@
   $("#mark").addEventListener("click", function(){
     var e = entries()[currentIndex()];
     if(!e) return;
-    if(state.saved[e.si]) delete state.saved[e.si];
-    else state.saved[e.si] = 1;
-    this.classList.toggle("on", !!state.saved[e.si]);
+    var id = STORIES[e.si].id, quitando = !!state.saved[e.si];
+    if(quitando) delete state.saved[e.si]; else state.saved[e.si] = 1;
+    this.classList.toggle("on", !quitando);
+
+    var boton = this;
+    var camino = "/bookmarks?person_id=eq." + encodeURIComponent(YO)
+      + "&story_id=eq." + encodeURIComponent(id);
+    var promesa = quitando
+      ? mandar("DELETE", camino)
+      : mandar("POST", "/bookmarks", { person_id: YO, story_id: id });
+
+    promesa.catch(function(err){
+      if(quitando) state.saved[e.si] = 1; else delete state.saved[e.si];
+      boton.classList.toggle("on", quitando);
+      avisar("No se pudo guardar: " + err.message);
+    });
   });
 
   flow.addEventListener("dblclick", function(ev){
@@ -832,25 +895,33 @@
     $("#send").disabled = !(n > 0 && n <= 100 && state.pickedLeaf !== null);
   });
 
-  /* The line lands in the version you were reading, or opens a brand new one. */
+  /* La línea cuelga del último fragmento del párrafo que estabas leyendo: si es
+     una versión vacía, del que la abre; si no, del último que tenga. La base
+     decide si cabe —turnos, cinco manos, cinco párrafos— y contesta. */
   function writeInto(e, t){
     if(!e) return;
-    var h = STORIES[e.si], nd = e.node, fr = { a:"you", t:t };
-    if(nd.blank) h.forks[nd.host.forkKey].branches.push([fr]);
-    else if(nd.branch) nd.branch.push(fr);
-    else h.route.push(fr);          // el final abierto de la historia
-    h.tree = null;
-    hands = null;
-    state.turns--;
-    state.fresh = fr;
-    updateTurns();
-    render();
-    var recien = flow.querySelector(".f.fresh");
-    if(recien){
-      var ps = screens(), suya = recien.closest(".screen");
-      for(var x = 0; x < ps.length; x++) if(ps[x] === suya) goToScreen(x);
-      setTimeout(function(){ recien.classList.remove("fresh"); state.fresh = null; }, 2400);
-    }
+    var padre = e.node.blank ? e.node.host.ultimo
+      : e.node.frs[e.node.frs.length - 1].id;
+
+    mandar("POST", "/rpc/write_line", { p_person: YO, p_parent: padre, p_text: t })
+      .then(function(nuevo){
+        var f = nuevo && nuevo.length ? nuevo[0] : nuevo;
+        var h = STORIES[e.si];
+        h.frags.push(f);
+        h.tree = null;
+        hands = null;
+        state.turns = Math.max(0, state.turns - 1);
+        state.fresh = f.id;
+        updateTurns();
+        render();
+        var recien = flow.querySelector(".f.fresh");
+        if(recien){
+          var ps = screens(), suya = recien.closest(".screen");
+          for(var x = 0; x < ps.length; x++) if(ps[x] === suya) goToScreen(x);
+          setTimeout(function(){ recien.classList.remove("fresh"); state.fresh = null; }, 2400);
+        }
+      })
+      .catch(function(err){ avisar(err.message); });
   }
 
   $("#send").addEventListener("click", function(){
@@ -885,6 +956,16 @@
     }, 2400);
   });
 
+  /* Cuando la base rechaza algo hay que decirlo, pero sin montar una pantalla:
+     una línea abajo que se va sola. */
+  function avisar(texto){
+    var d = $("#aviso");
+    d.textContent = texto;
+    d.classList.add("on");
+    clearTimeout(avisar.t);
+    avisar.t = setTimeout(function(){ d.classList.remove("on"); }, 3800);
+  }
+
   function updateTurns(){
     $("#turns").textContent = state.turns + (state.turns === 1 ? " turno" : " turnos");
   }
@@ -897,9 +978,16 @@
   Promise.all([
     pedir("/stories?select=id,created_at&order=created_at"),
     pedir("/fragments?select=id,story_id,parent_id,author_id,text,created_at&order=created_at"),
-    pedir("/likes?select=paragraph_id")
+    pedir("/likes?select=person_id,paragraph_id"),
+    pedir("/bookmarks?select=story_id&person_id=eq." + encodeURIComponent(YO)),
+    pedir("/people?select=id,turns&id=eq." + encodeURIComponent(YO))
   ]).then(function(res){
     var historias = res[0], fragmentos = res[1], respaldos = res[2];
+    var guardadas = res[3], quienSoy = res[4];
+
+    if(!quienSoy.length) throw new Error("no existe la persona '" + YO + "'");
+    state.turns = quienSoy[0].turns;
+    updateTurns();
 
     var cuenta = {};
     respaldos.forEach(function(l){ cuenta[l.paragraph_id] = (cuenta[l.paragraph_id] || 0) + 1; });
@@ -914,6 +1002,17 @@
       .filter(function(h){ return h.frags.length; });
 
     if(!STORIES.length) throw new Error("la base no devolvió historias");
+
+    /* Lo tuyo: qué respaldaste y qué guardaste. */
+    STORIES.forEach(function(h, i){
+      h.frags.forEach(function(f){
+        if(respaldos.some(function(l){ return l.person_id === YO && l.paragraph_id === f.id; })){
+          state.liked[i + ":" + f.id] = 1;
+        }
+      });
+      if(guardadas.some(function(b){ return b.story_id === h.id; })) state.saved[i] = 1;
+    });
+
     state.chain = [0];
     mode("read");
   }).catch(function(e){
