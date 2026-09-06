@@ -18,9 +18,8 @@
     --accent: #8a7a5e;
     --fresh: rgba(180,150,80,.28);
     --measure: 33em;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{ --paper:#12120f; --ink:#e4dfd4; --ink-soft:#8e887c; --ink-faint:#5b564d; --rule:#2a2823; --accent:#b3a179; --fresh:rgba(179,161,121,.22); }
+    /* Siempre claro: el papel es papel, y no cambia según el teléfono. */
+    color-scheme: light;
   }
   *{ box-sizing:border-box; }
   html{ -webkit-text-size-adjust:100%; }
@@ -108,9 +107,9 @@
     display:flex; justify-content:space-between; align-items:center;
     margin-bottom:6px; min-height:16px;
   }
-  .versions{ display:flex; gap:7px; align-items:center; }
+  .versions{ display:flex; gap:6px; align-items:center; }
   .versions i{
-    width:7px; height:7px; border-radius:50%; box-sizing:border-box;
+    width:5px; height:5px; border-radius:50%; box-sizing:border-box;
     background:var(--rule); transition:background-color .3s, border-color .3s;
   }
   .versions i.on{ background:var(--accent); }
@@ -649,16 +648,19 @@
      Versions are ordered left to right and the canon is the leftmost one. There
      is a single gesture, right to left, and it always advances: past the last
      one you come back to the canon. */
-  function nextVersion(){
+  /* El eje horizontal tiene dos extremos y no da la vuelta: se avanza hacia un
+     lado y se regresa hacia el otro. Los puntos ya dicen dónde estás, así que
+     los topes se ven; con la vuelta puesta uno no sabía si iba o volvía. */
+  function otherVersion(dir){
     var list = entries(), k = currentIndex(), e = list[k];
     if(!e || !e.parent) return;
-    var parent = e.parent;
-    if(parent.kids.length < 2) return;
-    var kids = parent.kids;
-    var vueltas = kids.length + (kids.length < VERSIONS ? 1 : 0);
+    var kids = e.parent.kids;
+    var ultimo = kids.length - 1 + (kids.length < VERSIONS ? 1 : 0);
+    if(ultimo < 1) return;
     var current = e.node.blank ? kids.length : kids.indexOf(e.node);
-    var sig = (current + 1) % vueltas;
-    state.choices[at(e.pos, parent)] = sig === kids.length ? "blank" : kids[sig].id;
+    var sig = current + dir;
+    if(sig < 0 || sig > ultimo) return;          // en los extremos, nada
+    state.choices[at(e.pos, e.parent)] = sig === kids.length ? "blank" : kids[sig].id;
     if(state.drift){ state.drift = false; $("#bDrift").classList.remove("on"); }
     render();
     goToScreen(k);
@@ -673,7 +675,10 @@
     if(!touching) return;
     touching = false;
     var t = e.changedTouches[0], dx = t.clientX - tX, dy = t.clientY - tY;
-    if(dx < -60 && -dx > Math.abs(dy) * 1.6){ nextVersion(); return; }
+    if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.6){
+      otherVersion(dx < 0 ? 1 : -1);
+      return;
+    }
     /* A tap that did not move: two of them in a row back the paragraph. The
        browser's own dblclick is unreliable on touch — it competes with
        double-tap-to-zoom — so the two taps get counted here. */
@@ -691,16 +696,17 @@
   var lastSide = 0;
   window.addEventListener("wheel", function(e){
     if($("#reading").hidden) return;
-    if(e.deltaX < 24 || e.deltaX < Math.abs(e.deltaY) * 1.4) return;
+    if(Math.abs(e.deltaX) < 24 || Math.abs(e.deltaX) < Math.abs(e.deltaY) * 1.4) return;
     if(Date.now() - lastSide < 700) return;
     lastSide = Date.now();
-    nextVersion();
+    otherVersion(e.deltaX > 0 ? 1 : -1);
   }, {passive:true});
 
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape") sign(null);
     if($("#reading").hidden) return;
-    if(e.key === "ArrowRight") nextVersion();
+    if(e.key === "ArrowRight") otherVersion(1);
+    if(e.key === "ArrowLeft") otherVersion(-1);
   });
 
   window.addEventListener("scroll", function(){
