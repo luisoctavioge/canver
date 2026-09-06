@@ -100,6 +100,8 @@
   }
   .screen.fork.current > .col > p::before{ color:var(--accent); }
   .screen.alt > .col > p{ color:var(--ink-soft); }
+  /* backed by you: a printer's mark, never a number */
+  .backed{ color:var(--accent); font-size:.55em; vertical-align:.28em; }
   .opening{ color:var(--ink-faint); display:block; padding-bottom:var(--lh); }
   .ending{ color:var(--ink-faint); }
   .end{ display:block; margin-bottom:16px; }
@@ -158,11 +160,11 @@
     display:flex; flex-direction:column; gap:5px;
   }
   #spine i{
-    height:3px; width:26px; border-radius:2px; box-sizing:border-box;
+    height:3px; width:16px; border-radius:2px; box-sizing:border-box;
     background:var(--rule);
     transition:background-color .3s, width .3s, border-color .3s;
   }
-  #spine i.on{ background:var(--accent); width:36px; }
+  #spine i.on{ background:var(--accent); width:24px; }
   /* a paragraph nobody has written yet is an outline, not a bar */
   #spine i.slot{ background:none; border:1px dashed var(--ink-faint); opacity:.55; }
 
@@ -364,7 +366,7 @@
   });
 
   var state = { story:0, chain:[0], authorship:false, drift:false, rolls:{}, turns:3,
-                 pickedLeaf:null, fresh:null, choices:{} };
+                 pickedLeaf:null, fresh:null, choices:{}, liked:{} };
 
   var $ = function(s){ return document.querySelector(s); };
   var flow = $("#flow"), root = document.documentElement;
@@ -375,15 +377,8 @@
      hangs as a sibling of the canonical paragraph. The paragraph is the screen. */
 
   var uid = 0;
-  function node(frs, from){ return { id:"n" + (uid++), frs:frs, from:from, kids:[], weight:0 }; }
-
-  /* Weight = fragments accumulated in the subtree, that is, turns people spent
-     going that way. The heaviest child is the canon, and comes first. */
-  function weigh(n){
-    n.weight = n.frs.length;
-    n.kids.forEach(function(h){ n.weight += weigh(h); });
-    n.kids.sort(function(a, b){ return b.weight - a.weight; });
-    return n.weight;
+  function node(frs, from, id){
+    return { id: id || ("n" + (uid++)), frs:frs, from:from, kids:[], likes:0 };
   }
 
   /* Every paragraph is five lines by five different hands. Nobody decides where
@@ -398,10 +393,15 @@
      The rules above the text follow this number. */
   var PARAS = 5;
 
-  function build(h){
+  function build(h, si){
+    h.likes = h.likes || {};
     var paras = [], current = null;
     h.route.forEach(function(fr, i){
-      if(i % LINES === 0){ current = node([], i); paras.push(current); }
+      if(i % LINES === 0){
+        current = node([], i, si + ":r" + i);
+        current.likeKey = "r" + i;
+        paras.push(current);
+      }
       current.frs.push(fr);
     });
     for(var j = 0; j < paras.length - 1; j++) paras[j].kids.push(paras[j + 1]);
@@ -415,14 +415,25 @@
       if(j <= 0 || j !== Math.floor(j)) return;
       var papa = paras[j - 1];
       papa.forkKey = k;
-      h.forks[k].branches.forEach(function(br){
-        var bn = node(br.slice(), -1);
+      h.forks[k].branches.forEach(function(br, x){
+        var clave = "f" + k + "." + x;
+        var bn = node(br.slice(), -1, si + ":" + clave);
+        bn.likeKey = clave;
         bn.branch = br;              // para poder escribirle una linea mas
         papa.kids.push(bn);
       });
     });
 
-    weigh(paras[0]);
+    /* Canon: at every fork the most liked version goes first. A tie keeps the
+       older one, because the sort is stable and the canonical continuation was
+       pushed before any branch. Subtree weight used to decide this: liking a
+       version now moves it ahead of a whole continuation. */
+    (function rec(n){
+      n.kids.forEach(function(kid){ kid.likes = h.likes[kid.likeKey] || 0; });
+      n.kids.sort(function(a, b){ return b.likes - a.likes; });
+      n.kids.forEach(rec);
+    })(paras[0]);
+
     return paras[0];
   }
 
@@ -464,50 +475,38 @@
 
   function tree(si){
     var h = STORIES[si];
-    if(!h.tree) h.tree = build(h);
+    if(!h.tree) h.tree = build(h, si);
     return h.tree;
   }
 
   /* The canon is followed by default. A reader's choice or a die diverts it. */
   function at(pos, n){ return pos + ":" + n.id; }
 
-  /* Rebuilding a tree mints new node ids, so every choice keyed to the old ones
-     goes stale and the reading snaps back to canon. After writing sideways,
-     re-aim the reading at the version the line just landed in. */
-  function aimAt(si, fr){
-    state.chain.forEach(function(sj, pos){
-      if(sj !== si) return;
-      (function rec(n){
-        n.kids.forEach(function(kid, i){
-          if(kid.frs.indexOf(fr) >= 0) state.choices[at(pos, n)] = i;
-          rec(kid);
-        });
-      })(tree(si));
-    });
-  }
-
   function routeOf(si, pos){
     var n = tree(si), route = [];
     while(n){
       route.push(n);
       if(route.length >= PARAS || !n.kids.length) break;
-      var i = 0, key = at(pos, n);
-      if(state.drift && state.rolls[key] != null) i = state.rolls[key];
-      else if(state.choices[key] != null) i = state.choices[key];
+      /* A choice remembers which version, not which position: likes reorder the
+         siblings, and a position would then point at somebody else. */
+      var key = at(pos, n), pick = null, next = null;
+      if(state.drift && state.rolls[key] != null) pick = state.rolls[key];
+      else if(state.choices[key] != null) pick = state.choices[key];
       /* Past the last version there is an empty one: reaching the end of the
          versions is itself the invitation to write the next. */
-      if(n.forkKey && i >= n.kids.length){
+      if(pick === "blank" && n.forkKey){
         route.push({ blank:true, frs:[], kids:[], from:-1, id:"b" + n.id, host:n });
         break;
       }
-      n = n.kids[Math.min(i, n.kids.length - 1)];
+      if(pick != null) n.kids.forEach(function(kid){ if(kid.id === pick) next = kid; });
+      n = next || n.kids[0];
     }
     return route;
   }
 
   function rollFor(pos){
     (function rec(n){
-      if(n.kids.length > 1) state.rolls[at(pos, n)] = Math.floor(Math.random() * n.kids.length);
+      if(n.kids.length > 1) state.rolls[at(pos, n)] = n.kids[Math.floor(Math.random() * n.kids.length)].id;
       n.kids.forEach(rec);
     })(tree(state.chain[pos]));
   }
@@ -599,8 +598,10 @@
          behind it to carry over. */
       var arriba = e.parent ? echo(e.parent)
         : (e.opens ? '<span class="mono opening">A new story</span>' : "");
+      var mio = state.liked[e.si + ":" + e.node.likeKey];
+      if(mio) pluma = '<span class="backed">●</span>' + pluma;
       html += '<div class="screen' + (isFork ? " fork" : "") + (isAlt ? " alt" : "")
-        + (e.node.blank ? " blank" : "") + '">'
+        + (e.node.blank ? " blank" : "") + (mio ? " liked" : "") + '">'
         + '<div class="col">' + arriba
         + (e.node.blank ? "<p>" + pluma + "</p>" : paraHTML(e.node, false, pluma))
         + "</div></div>";
@@ -690,9 +691,11 @@
     if(!e || e.ending || !e.parent) return;
     var parent = e.parent;
     if(parent.kids.length < 2) return;
-    var vueltas = parent.forkKey ? parent.kids.length + 1 : parent.kids.length;
-    var current = e.node.blank ? parent.kids.length : parent.kids.indexOf(e.node);
-    state.choices[at(e.pos, parent)] = (current + 1) % vueltas;
+    var kids = parent.kids;
+    var vueltas = parent.forkKey ? kids.length + 1 : kids.length;
+    var current = e.node.blank ? kids.length : kids.indexOf(e.node);
+    var sig = (current + 1) % vueltas;
+    state.choices[at(e.pos, parent)] = sig === kids.length ? "blank" : kids[sig].id;
     if(state.drift){ state.drift = false; $("#bDrift").classList.remove("on"); }
     render();
     goToScreen(k);
@@ -733,6 +736,37 @@
   window.addEventListener("resize", function(){
     if($("#reading").hidden) return;
     measure(); markCurrent();
+  });
+
+  /* Double tap backs a paragraph. There is no count anywhere: what you see is
+     not how many liked it, it is which version the likes made canon. */
+  function toggleLike(e){
+    var h = STORIES[e.si], key = e.node.likeKey, mio = e.si + ":" + key;
+    h.likes = h.likes || {};
+    if(state.liked[mio]){
+      delete state.liked[mio];
+      h.likes[key] = Math.max(0, (h.likes[key] || 0) - 1);
+    } else {
+      state.liked[mio] = 1;
+      h.likes[key] = (h.likes[key] || 0) + 1;
+      /* Stay on what you just backed, even if it just became the canon. */
+      var padre = e.parent;
+      if(padre) state.choices[at(e.pos, padre)] = e.node.id;
+    }
+    h.tree = null;
+    var y = window.scrollY;
+    render();
+    window.scrollTo(0, y);
+  }
+
+  flow.addEventListener("dblclick", function(ev){
+    var sc = ev.target.closest(".screen");
+    if(!sc) return;
+    var ps = screens(), idx = -1;
+    for(var i = 0; i < ps.length; i++) if(ps[i] === sc) idx = i;
+    var e = entries()[idx];
+    if(!e || e.ending || e.node.blank) return;
+    toggleLike(e);
   });
 
   /* With authorship on, tapping a fragment tells you whose hand that is. */
@@ -869,8 +903,6 @@
     else h.route.push(fr);          // el final abierto de la historia
     h.tree = null;
     hands = null;
-    state.choices = {};            // rebuilding mints new ids, so they are stale
-    aimAt(e.si, fr);
     state.turns--;
     state.fresh = fr;
     updateTurns();

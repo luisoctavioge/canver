@@ -1,6 +1,6 @@
 # Canver — Open threads
 
-**Opened:** 04-sep-2026. **Last pruned:** 05-sep-2026.
+**Opened:** 04-sep-2026. **Last pruned:** 05-sep-2026 (the like moved to `02`).
 **What this is:** everything that is still being thought through, written down so it does not get lost. Nothing here is decided. When something here gets decided it moves to `02-system-v0.md` and disappears from this file.
 
 ---
@@ -11,21 +11,7 @@
 
 ---
 
-## 2. The like — per paragraph
-
-Wanted. The shape:
-
-- A like goes to a **paragraph**, not a line.
-- More likes → more canon.
-- **Ties break by time.**
-
-*Note, so the decision is visible when it gets taken:* this amends non-negotiable rule 4 (no likes, no votes) and displaces the canon rule in §4, which today is subtree weight — turns spent, not thumbs. Both would then be competing signals and one has to win. Worth deciding explicitly rather than by accident.
-
-**Next up.**
-
----
-
-## 3. Branching from a line
+## 2. Branching from a line
 
 One shape still on the table and not built: you pick the line inside a paragraph you liked most, that line becomes line zero of a branch, and you start a new paragraph from it.
 
@@ -33,14 +19,14 @@ It is a different act from what exists now. Today a version is an alternative to
 
 ---
 
-## 4. Numbers that are provisional, not settled
+## 3. Numbers that are provisional, not settled
 
 - **Five paragraphs per story.** Tried at four first; put back to five so more of the sample story stays reachable. Still provisional, and 3 (15 people) is the other candidate.
 - **No cap on versions per paragraph.** The horizontal axis is open-ended on purpose; if it turns out to sprawl, the cap that was floated was 3.
 
 ---
 
-## 5. The sample fiction no longer fits the rules
+## 4. The sample fiction no longer fits the rules
 
 The train story was written as one continuous piece of 51 lines. Under the five-paragraph cap only its first 25 lines are reachable: **26 lines and two of its five forks are still unreadable.**
 
@@ -54,7 +40,7 @@ Not a decision code can take — rule 8.
 
 ---
 
-## 6. What the phone actually showed
+## 5. What the phone actually showed
 
 From testing the horizontal scroll on the device, in his words:
 
@@ -66,6 +52,6 @@ That order matters: the like and the sideways contribution were not designed, th
 
 ---
 
-## 7. Still needed, and only by hand
+## 6. Still needed, and only by hand
 
 More alternate versions, so the horizontal axis has something to show: four or so per fork, of three to five lines each. The engine takes any number now, and the blank slot at the end lets them be written from inside the product. Rule 8 — the AI does not write fragments.

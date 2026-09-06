@@ -49,12 +49,11 @@ Local coherence plus global drift. It is the direct answer to what went wrong in
 | Cost of seeding | 3 turns, unlocked after N continuations | **You earn the right to start by having continued.** Without this, everybody seeds and nobody continues. |
 | Reward | +1 turn when somebody continues YOUR fragment | See below. |
 
-### The metric is not the like: it is fecundity
+### Two different jobs: fecundity describes, the like decides
 
-The like rewards the **closed, brilliant** fragment. Here the **open, continuable** one is rewarded: your reward is that somebody spent their scarce resource following you.
+**Fecundity** — how many continuations were born from your fragment — is what describes a hand. It rewards the **open, continuable** fragment rather than the closed and brilliant one, because your reward is that somebody spent a scarce turn following you. It stays unfalsifiable: every point of it costs another person a turn.
 
-1. The incentive points at the goal of the system, not against it.
-2. The metric is unfalsifiable: every point costs another person a turn.
+**The like** does a different job: it decides which version of a moment is canon. It is free, and that is the risk taken knowingly on 05-sep-2026 — the guard is that **no count is ever shown**. You cannot see how many backed something; you can only see what they made canon. There is no number to chase.
 
 ---
 
@@ -62,19 +61,17 @@ The like rewards the **closed, brilliant** fragment. Here the **open, continuabl
 
 Every fork gets **resolved**: somebody decides which branch the reading follows. There is a single primitive and three ways of driving it.
 
-### Canon — resolved by collective spend
+### Canon — resolved by the likes
 
-At every fork, the winner is the branch whose **subtree accumulated the most fragments**. Not the direct children —that is myopic: a branch with three children that die would beat one with a single child that spawned forty— but the weight of the whole subtree.
+At every fork the winner is the version with **the most likes on its paragraph**. A double tap backs one. No count is shown anywhere: you see which version won, never by how much.
 
-Every fragment of that weight **is a turn somebody spent**. That is why counting the subtree is literally measuring collective spend. Canon is not voted: it is paid for. There is no vote button anywhere in the product.
+*(Revised 05-sep-2026. It used to be subtree weight — the branch with the most accumulated fragments, each one a turn somebody spent. That was unfalsifiable and paid for; the like is free. What made the change worth it is that the like came from reading, not from theory: swiping through versions of the same moment, some of them make you want to back them.)*
 
-Three properties follow from that:
+Three properties:
 
-1. **Canon is not permanent.** It is recalculated as the tree grows. An abandoned branch loses canon to one that keeps growing. Today's text may not be the text a month from now: that is the work breathing.
-2. **Tie → the older branch.** Stability. If recency breaks ties, the text trembles every week.
-3. **There is never a cold start.** A fork exists *only if* two people already spent turns there. At every decision point there is data by construction.
-
-Still pending is the **age bias**: older branches accumulate more simply by having existed longer. It can be normalised over time; for the one-week test it is ignored and measured.
+1. **Canon is not permanent.** It is recalculated as people back things. Today's text may not be the text a month from now: that is the work breathing.
+2. **Tie → the older one.** Stability. If recency breaks ties, the text trembles every week. In practice the canonical continuation was written first, so with no likes at all nothing moves.
+3. **A like can outrank a whole continuation.** At a fork the siblings are the next canonical paragraph and the alternate versions. One like on a version puts it ahead of a continuation that carries the rest of the story — and since a version is a dead end until somebody continues it, the story re-routes and gets shorter by default. Nothing is lost: the displaced continuation is one swipe away. Whether that is the right behaviour is worth watching in the test.
 
 ### By hand — resolved by the reader
 
