@@ -72,14 +72,20 @@ docs/02-system-v0.md    the whole system: primitives, economy, visual layer
 docs/03-open-threads.md what is still being thought through, nothing decided
 prototype/index.html    static prototype, one file, no dependencies
 db/01-schema.sql        tables and row policies for the shared database
-db/02-seed.sql          the five stories as rows, generated from the prototype
+db/02-seed.sql          five stories, one line each: everything else gets written
+db/03-write.sql         first version of write_line and seed_story
+db/04-turns.sql         a turn a day, claimed on arrival, no scheduler
+db/05-fix-write.sql     a fix that never ran; superseded by the 06
+db/06-una-sola-linea.sql  prunes the corpus back to the seed, and fixes write_line
 DIAGRAM 1.png           the reading model as it stands
 DIAGRAM 2.png           stories chained in one stream, still to be designed
 ```
 
-**Current phase:** 1 — static prototype finished. It simulates the whole product with no backend: two-axis reading (vertical one paragraph per screen, horizontal the alternate versions), canon computed by subtree weight, fork marks in the margin, authorship mode, Drift, story index, and the turn flow with a 100-character limit. State lives in memory; reloading returns to the beginning.
+**Current phase:** 2 — the prototype reads and writes against a shared Postgres (Supabase), reached over plain `fetch`, so it is still one file with no build. Who you are comes in the link (`…/prototype/#ana`); likes, bookmarks and lines are stored; turns accrue one a day, claimed on arrival. It is live at `luisoctavioge.github.io/canver/prototype/`.
 
-**Phase 2 (next):** real persistence and a shareable link, to run a one-week test with 20–30 people.
+**The corpus starts at one line.** *(06-sep-2026.)* Five stories, one sentence each, nothing continued. Reading something already finished gives you nothing to continue, and continuing is the only thing the test measures — so what the test starts from is five seeds and five turns' worth of appetite. The five sentences were already written, by their own hands, in the sample fiction; choosing which of them open rather than continue was the only editing done, and rule 8 stands.
+
+**Still to run:** `db/06-una-sola-linea.sql`, by hand in the SQL editor. It is a one-time script and deliberately not a migration: it deletes every fragment that hangs off a seed, which is exactly the wrong thing to replay once people have written.
 
 **What that test measures:**
 

@@ -434,18 +434,22 @@
     var n = tree(si), route = [];
     while(n){
       route.push(n);
-      if(route.length >= PARAS || !n.kids.length) break;
+      if(route.length >= PARAS) break;
       /* A choice remembers which version, not which position: likes reorder the
          siblings, and a position would then point at somebody else. */
       var key = at(pos, n), pick = null, next = null;
       if(state.drift && state.rolls[key] != null) pick = state.rolls[key];
       else if(state.choices[key] != null) pick = state.choices[key];
       /* Past the last version there is an empty one: reaching the end of the
-         versions is itself the invitation to write the next. */
-      if(pick === "blank" && n.kids.length && n.kids.length < VERSIONS){
+         versions is itself the invitation to write the next. Un parrafo cerrado
+         que todavia nadie continuo es el mismo caso con cero versiones, y sin
+         esto una historia recien sembrada no tendria por donde seguir. */
+      var cerrado = !n.blank && n.frs.length >= LINES;
+      if(cerrado && n.kids.length < VERSIONS && (pick === "blank" || !n.kids.length)){
         route.push({ blank:true, frs:[], kids:[], from:-1, id:"b" + n.id, host:n });
         break;
       }
+      if(!n.kids.length) break;
       if(pick != null) n.kids.forEach(function(kid){ if(kid.id === pick) next = kid; });
       n = next || n.kids[0];
     }
@@ -544,7 +548,7 @@
         var cola = !e.node.blank && e.k === e.of - 1;
         libre = e.node.blank || ((e.node.branch || cola)
           && e.node.frs.length < LINES
-          && !e.node.frs.some(function(fr){ return fr.a === "you"; }));
+          && !e.node.frs.some(function(fr){ return fr.a === YO; }));
       }
       var pluma = libre
         ? '<span class="write' + (e.node.frs.length ? " after" : "")
@@ -813,8 +817,8 @@
     el.classList.add("picked");
 
     var a = el.dataset.a, m = census()[a] || { fragments:0, fecundity:0 };
-    var pron = a === "you" ? "" : (PROFILES[a] || {}).pron;
-    $("#handName").textContent = a === "you" ? "tú" : a;
+    var pron = a === YO ? "" : (PROFILES[a] || {}).pron;
+    $("#handName").textContent = a === YO ? "tú" : a;
     $("#handName").style.color = "hsl(" + (TINTS[a] || "0,0%") + ",58%)";
     $("#handData").textContent = (pron ? pron + " · " : "")
       + plural(m.fragments, "fragmento", "fragmentos") + " · "
