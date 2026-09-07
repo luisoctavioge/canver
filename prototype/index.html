@@ -317,16 +317,26 @@
 
   var STORIES = [];
 
-  var TINTS = {ana:"18,90%",bruno:"48,70%",mireia:"160,55%",kai:"280,45%",dana:"5,75%",jonas:"210,60%",olga:"95,55%",sara:"330,55%",ruy:"35,80%",tavo:"250,50%",lia:"185,60%",martin:"60,70%",isis:"300,50%",nube:"200,50%",cielo:"140,50%",you:"25,95%"};
+  /* El color de cada mano no sale de una lista escrita a mano: la gente entra
+     por la base, y una lista se queda corta el primer día que alguien nuevo
+     escribe. Se reparten los tonos por la rueda con el ángulo áureo, en orden
+     alfabético, que es la manera de que ninguno caiga encima de otro por
+     muchos que sean; la saturación alterna para separar a los vecinos. En
+     modo autoría dos manos distintas nunca pueden verse iguales.
 
-  /* Placeholder pronouns, cycled through the list on purpose: a name does not
-     tell you anyone's pronoun, each person tells you their own. In the real
-     product this is something people set on their own profile. */
-  var PRONOUNS = ["ella", "él", "elle"];
+     Sacarlo del nombre con un hash parecía más simple y chocaba: de dieciocho
+     nombres, dos pares salían idénticos. */
+  var tintes = {};
+  function fijarTintes(gente){
+    gente.map(function(q){ return q.id; }).sort().forEach(function(id, i){
+      tintes[id] = Math.round((i * 137.508) % 360) + "," + (i % 2 ? 55 : 88) + "%";
+    });
+  }
+  function tinte(a){ return tintes[a] || "0,0%"; }
+
+  /* El pronombre lo pone cada quien, así que se lee de la base y no se inventa.
+     Quien no lo haya puesto no tiene: un nombre no lo dice. */
   var PROFILES = {};
-  Object.keys(TINTS).forEach(function(a, i){
-    if(a !== "you") PROFILES[a] = { pron: PRONOUNS[i % PRONOUNS.length] };
-  });
 
   var state = { story:0, chain:[0], authorship:false, drift:false, rolls:{}, turns:3,
                  pickedLeaf:null, fresh:null, choices:{}, saved:{} };
@@ -539,13 +549,13 @@
        the same text, so only one of the two copies may ever be visible. */
     var s = "<p>", parked = echo ? [] : tail(p).frs;
     p.frs.forEach(function(fr, x){
-      var tinte = TINTS[fr.a] || "0,0%";
+      var tt = tinte(fr.a);
       s += (x ? " " : "")
         + '<span class="f' + (!echo && fr.id && fr.id === state.fresh ? " fresh" : "")
         + (!echo && esNuevo(fr) ? " nuevo" : "")
         + (parked.indexOf(fr) >= 0 ? " dup" : "")
         + '" data-a="' + fr.a + '" data-id="' + (fr.id || "") + '"'
-        + ' style="--tint:hsla(' + tinte + ',55%,.13);--tint2:hsla(' + tinte + ',55%,.34)">'
+        + ' style="--tint:hsla(' + tt + ',55%,.13);--tint2:hsla(' + tt + ',55%,.34)">'
         + fr.t + "</span>";
     });
     return s + (pluma ? (p.frs.length ? " " : "") + pluma : "") + "</p>";
@@ -802,7 +812,7 @@
     var a = el.dataset.a, m = census()[a] || { fragments:0, fecundity:0 };
     var pron = a === YO ? "" : (PROFILES[a] || {}).pron;
     $("#handName").textContent = a === YO ? "tú" : a;
-    $("#handName").style.color = "hsl(" + (TINTS[a] || "0,0%") + ",58%)";
+    $("#handName").style.color = "hsl(" + tinte(a) + ",58%)";
     $("#handData").textContent = (pron ? pron + " · " : "")
       + plural(m.fragments, "fragmento", "fragmentos") + " · "
       + plural(m.fecundity, "continuación", "continuaciones");
@@ -1000,13 +1010,17 @@
     pedir("/fragments?select=id,story_id,parent_id,author_id,text,created_at&order=created_at"),
     pedir("/likes?select=paragraph_id"),
     pedir("/bookmarks?select=story_id&person_id=eq." + encodeURIComponent(YO)),
+    pedir("/people?select=id,pronoun"),
     mandar("POST", "/rpc/refresh_turns", { p_person: YO }),
     /* Si la base todavía no sabe de visitas, se lee igual: simplemente nada
        aparece como nuevo. */
     mandar("POST", "/rpc/mark_seen", { p_person: YO }).catch(function(){ return null; })
   ]).then(function(res){
     var historias = res[0], fragmentos = res[1], respaldos = res[2];
-    var guardadas = res[3], misTurnos = res[4], visitaAnterior = res[5];
+    var guardadas = res[3], gente = res[4], misTurnos = res[5], visitaAnterior = res[6];
+
+    gente.forEach(function(q){ PROFILES[q.id] = { pron: q.pronoun || "" }; });
+    fijarTintes(gente);
 
     /* Desde cuándo cuenta como nuevo. La base ya apuntó esta visita. */
     DESDE = Date.parse(visitaAnterior) || 0;
