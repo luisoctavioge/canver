@@ -73,6 +73,11 @@
   .screen.current > .col > p{ animation:brighten .5s ease; }
   .f{ transition:background-color 1s ease; border-radius:2px; }
   .f.fresh{ background-color:var(--fresh); }
+  /* Lo que llegó desde tu última visita, con el mismo tinte cálido que una
+     línea recién escrita: sin borde, sin etiqueta y sin contador de novedades.
+     Se apaga sola cuando te quedas en esa pantalla, porque leerla es
+     exactamente lo que la deja de hacer nueva. */
+  .f.nuevo{ background-color:var(--fresh); }
   #flow.authorship .f{ background-color:var(--tint); }
   /* in authorship mode the picked fragment deepens and names its hand below */
   #flow.authorship .f.picked{ background-color:var(--tint2); }
@@ -101,11 +106,10 @@
     letter-spacing:.08em; text-transform:uppercase;
   }
   .screen.alt > .col > p{ color:var(--ink-soft); }
-  /* Backed by you. Outline when it is not, filled when it is, and never a
-     number: you see what you gave, not how many gave it. It is also the way
-     in — the double tap works, but a heart says so without being explained. */
-  /* Arriba del párrafo: a la izquierda en qué versión del momento estás, a la
-     derecha si lo respaldaste. Lo del momento y lo del párrafo, separados. */
+  /* Arriba del párrafo, en qué versión de este momento estás. El respaldo
+     vivía en la otra punta de esta misma fila y está retirado por ahora: la
+     primera prueba mira cómo escribe la gente, y un corazón invita a opinar
+     sobre lo que hay antes que a continuarlo. */
   .head{
     display:flex; justify-content:space-between; align-items:center;
     margin-bottom:6px; min-height:16px;
@@ -119,11 +123,6 @@
   /* la última, punteada: esa versión no la ha escrito nadie */
   .versions i.slot{ background:none; border:1px dotted var(--ink-faint); }
   .versions i.slot.on{ border-color:var(--accent); }
-  .heart{
-    padding:0; border:0; background:none;
-    color:var(--accent); cursor:pointer; font-size:16px; line-height:1;
-  }
-  .heart:focus-visible{ outline:1px solid var(--accent); outline-offset:3px; }
   .opening{ color:var(--ink-faint); display:block; padding-bottom:var(--lh); }
   /* Writing is reading with a caret in it: same type, same size, same colour,
      no box and no button. La invitación no depende de que el scroll haya
@@ -330,7 +329,7 @@
   });
 
   var state = { story:0, chain:[0], authorship:false, drift:false, rolls:{}, turns:3,
-                 pickedLeaf:null, fresh:null, choices:{}, liked:{}, saved:{} };
+                 pickedLeaf:null, fresh:null, choices:{}, saved:{} };
 
   var $ = function(s){ return document.querySelector(s); };
   var flow = $("#flow"), root = document.documentElement;
@@ -379,7 +378,7 @@
     function parrafo(primero){
       var frs = [], f = primero;
       while(f && frs.length < LINES){
-        frs.push({ a:f.author_id, t:f.text, id:f.id });
+        frs.push({ a:f.author_id, t:f.text, id:f.id, at:Date.parse(f.created_at) });
         if(frs.length === LINES) break;
         f = (porPadre[f.id] || [])[0];      // dentro de un párrafo no se bifurca
       }
@@ -510,6 +509,29 @@
     return out;
   }
 
+  /* ---------- lo que llegó mientras no estabas ---------- */
+
+  /* DESDE es el momento de tu visita anterior, que la base recuerda. Lo tuyo
+     nunca es nuevo para ti, y lo que ya se apagó en esta sentada tampoco
+     vuelve a encenderse aunque se repinte la pantalla. */
+  var DESDE = 0, vistos = {};
+
+  function esNuevo(fr){
+    return !!(DESDE && fr.at > DESDE && fr.a !== YO && !vistos[fr.id]);
+  }
+
+  var apagando = null;
+  function apagarNuevas(sc){
+    clearTimeout(apagando);
+    if(!sc || !sc.querySelector(".nuevo")) return;
+    apagando = setTimeout(function(){
+      Array.prototype.forEach.call(sc.querySelectorAll(".nuevo"), function(el){
+        if(el.dataset.id) vistos[el.dataset.id] = 1;
+        el.classList.remove("nuevo");
+      });
+    }, 1800);
+  }
+
   /* ---------- reading: one screen per paragraph ---------- */
 
   function paraHTML(p, echo, pluma){
@@ -520,8 +542,9 @@
       var tinte = TINTS[fr.a] || "0,0%";
       s += (x ? " " : "")
         + '<span class="f' + (!echo && fr.id && fr.id === state.fresh ? " fresh" : "")
+        + (!echo && esNuevo(fr) ? " nuevo" : "")
         + (parked.indexOf(fr) >= 0 ? " dup" : "")
-        + '" data-a="' + fr.a + '"'
+        + '" data-a="' + fr.a + '" data-id="' + (fr.id || "") + '"'
         + ' style="--tint:hsla(' + tinte + ',55%,.13);--tint2:hsla(' + tinte + ',55%,.34)">'
         + fr.t + "</span>";
     });
@@ -575,16 +598,13 @@
       /* Lo que se arrastra del párrafo anterior. Una historia que empieza no
          arrastra nada: quien lo dice es el rótulo del lomo. */
       var arriba = e.parent ? echo(e.parent) : "";
-      var mio = state.liked[e.si + ":" + e.node.likeKey];
-      var corazon = e.node.blank ? ""
-        : '<button class="heart" data-i="' + idx + '">'
-          + (mio ? "♥" : "♡") + "</button>";
       html += '<div class="screen' + (isAlt ? " alt" : "")
-        + (e.node.blank ? " blank" : "") + (mio ? " liked" : "") + '">'
+        + (e.node.blank ? " blank" : "") + '">'
         + '<div class="col">' + arriba
-        + ((puntos || corazon)
-            ? '<div class="head">' + (puntos || "<span></span>") + corazon + "</div>"
-            : "")
+        /* La fila va siempre, tenga puntos o no: si apareciera y desapareciera,
+           el párrafo daría un salto al pasar de un momento con versiones a uno
+           sin ellas. */
+        + '<div class="head">' + puntos + "</div>"
         + (e.node.blank ? "<p>" + pluma + "</p>" : paraHTML(e.node, false, pluma))
         + "</div></div>";
     });
@@ -646,6 +666,7 @@
       ps[i].classList.toggle("current", i === k);
       ps[i].classList.toggle("away", i !== k);
     }
+    apagarNuevas(ps[k]);
     paintSpine(entries()[k]);
   }
 
@@ -695,7 +716,7 @@
     goToScreen(k);
   }
 
-  var tX = 0, tY = 0, touching = false, ultimoToque = {};
+  var tX = 0, tY = 0, touching = false;
   window.addEventListener("touchstart", function(e){
     if($("#reading").hidden || e.touches.length !== 1) return;
     touching = true; tX = e.touches[0].clientX; tY = e.touches[0].clientY;
@@ -708,18 +729,6 @@
       otherVersion(dx < 0 ? 1 : -1);
       return;
     }
-    /* A tap that did not move: two of them in a row back the paragraph. The
-       browser's own dblclick is unreliable on touch — it competes with
-       double-tap-to-zoom — so the two taps get counted here. */
-    if(Math.abs(dx) > 12 || Math.abs(dy) > 12) return;
-    if(t.target && t.target.closest && t.target.closest(".heart")) return;
-    var ahora = Date.now(), donde = t.target && t.target.closest && t.target.closest(".screen");
-    if(donde && donde === ultimoToque.donde && ahora - ultimoToque.cuando < 340){
-      ultimoToque = {};
-      likeEnPantalla(donde);
-      return;
-    }
-    ultimoToque = { donde: donde, cuando: ahora };
   }, {passive:true});
 
   var lastSide = 0;
@@ -756,51 +765,6 @@
     if(!$("#reading").hidden){ measure(); markCurrent(); }
   });
 
-  /* Double tap backs a paragraph. There is no count anywhere: what you see is
-     not how many liked it, it is which version the likes made canon. */
-  /* El corazón se pinta de inmediato y se guarda después: el pulgar no debe
-     esperar a la red. Si la base falla, se deshace y se avisa. */
-  function toggleLike(e){
-    var h = STORIES[e.si], key = e.node.likeKey, mio = e.si + ":" + key;
-    var quitando = !!state.liked[mio];
-
-    if(quitando){
-      delete state.liked[mio];
-      h.likes[key] = Math.max(0, (h.likes[key] || 0) - 1);
-    } else {
-      state.liked[mio] = 1;
-      h.likes[key] = (h.likes[key] || 0) + 1;
-      var padre = e.parent;
-      if(padre) state.choices[at(e.pos, padre)] = e.node.id;
-    }
-    h.tree = null;
-    var y = window.scrollY;
-    render();
-    window.scrollTo(0, y);
-
-    var camino = "/likes?person_id=eq." + encodeURIComponent(YO)
-      + "&paragraph_id=eq." + encodeURIComponent(key);
-    var promesa = quitando
-      ? mandar("DELETE", camino)
-      : mandar("POST", "/likes", { person_id: YO, paragraph_id: key });
-
-    promesa.catch(function(err){
-      if(quitando){ state.liked[mio] = 1; h.likes[key] = (h.likes[key] || 0) + 1; }
-      else { delete state.liked[mio]; h.likes[key] = Math.max(0, (h.likes[key] || 0) - 1); }
-      h.tree = null;
-      render();
-      avisar("No se pudo guardar: " + err.message);
-    });
-  }
-
-  function likeEnPantalla(sc){
-    var ps = screens(), idx = -1;
-    for(var i = 0; i < ps.length; i++) if(ps[i] === sc) idx = i;
-    var e = entries()[idx];
-    if(!e || e.node.blank) return;
-    toggleLike(e);
-  }
-
   /* The bookmark belongs to the story you are standing in, whichever that is. */
   $("#mark").addEventListener("click", function(){
     var e = entries()[currentIndex()];
@@ -821,20 +785,6 @@
       boton.classList.toggle("on", quitando);
       avisar("No se pudo guardar: " + err.message);
     });
-  });
-
-  flow.addEventListener("dblclick", function(ev){
-    if(ev.target.closest(".heart")) return;
-    var sc = ev.target.closest(".screen");
-    if(sc) likeEnPantalla(sc);
-  });
-
-  flow.addEventListener("click", function(ev){
-    var h = ev.target.closest(".heart");
-    if(!h) return;
-    ev.stopPropagation();
-    var e = entries()[parseInt(h.dataset.i, 10)];
-    if(e) toggleLike(e);
   });
 
   /* With authorship on, tapping a fragment tells you whose hand that is. */
@@ -1037,7 +987,7 @@
      se cuenta nada. Cuando no queda ninguno sí hay que decirlo, porque la
      invitación a escribir desaparece y sin explicación se lee como una avería. */
   function updateTurns(){
-    $("#turns").textContent = state.turns > 0 ? "1 turno por día" : "Vuelve mañana";
+    $("#turns").textContent = state.turns > 0 ? "2 turnos por día" : "Vuelve mañana";
   }
 
   /* Nada que leer hasta que llegue de la base. */
@@ -1048,14 +998,20 @@
   Promise.all([
     pedir("/stories?select=id,created_at&order=created_at"),
     pedir("/fragments?select=id,story_id,parent_id,author_id,text,created_at&order=created_at"),
-    pedir("/likes?select=person_id,paragraph_id"),
+    pedir("/likes?select=paragraph_id"),
     pedir("/bookmarks?select=story_id&person_id=eq." + encodeURIComponent(YO)),
-    mandar("POST", "/rpc/refresh_turns", { p_person: YO })
+    mandar("POST", "/rpc/refresh_turns", { p_person: YO }),
+    /* Si la base todavía no sabe de visitas, se lee igual: simplemente nada
+       aparece como nuevo. */
+    mandar("POST", "/rpc/mark_seen", { p_person: YO }).catch(function(){ return null; })
   ]).then(function(res){
     var historias = res[0], fragmentos = res[1], respaldos = res[2];
-    var guardadas = res[3], misTurnos = res[4];
+    var guardadas = res[3], misTurnos = res[4], visitaAnterior = res[5];
 
-    /* Un turno al día: la base los cobra al aparecer, no un reloj nocturno. */
+    /* Desde cuándo cuenta como nuevo. La base ya apuntó esta visita. */
+    DESDE = Date.parse(visitaAnterior) || 0;
+
+    /* Dos turnos al día: la base los cobra al aparecer, no un reloj nocturno. */
     state.turns = typeof misTurnos === "number" ? misTurnos : 0;
     updateTurns();
 
@@ -1073,13 +1029,8 @@
 
     if(!STORIES.length) throw new Error("la base no devolvió historias");
 
-    /* Lo tuyo: qué respaldaste y qué guardaste. */
+    /* Lo tuyo: qué guardaste. */
     STORIES.forEach(function(h, i){
-      h.frags.forEach(function(f){
-        if(respaldos.some(function(l){ return l.person_id === YO && l.paragraph_id === f.id; })){
-          state.liked[i + ":" + f.id] = 1;
-        }
-      });
       if(guardadas.some(function(b){ return b.story_id === h.id; })) state.saved[i] = 1;
     });
 
