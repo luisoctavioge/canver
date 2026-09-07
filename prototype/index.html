@@ -59,9 +59,12 @@
     opacity:.4;
   }
   /* The same text must never be on screen twice. Once a paragraph stops being
-     the current one, the tail that the next screen already parked fades out. */
+     the current one, the tail that the next screen already parked fades out.
+     Se oculta en las pantallas marcadas como pasadas y no en «toda la que no
+     sea la actual»: si el marcado no llega a correr, lo peor que pasa es leer
+     algo dos veces, y no que falte una frase. */
   .dup{ transition:opacity .22s ease; }
-  .screen:not(.current) .dup{ opacity:0; }
+  .screen.away .dup{ opacity:0; }
   /* On arrival the new paragraph brightens to be read. */
   @keyframes brighten{
     from{ opacity:.5; }
@@ -123,9 +126,12 @@
   .heart:focus-visible{ outline:1px solid var(--accent); outline-offset:3px; }
   .opening{ color:var(--ink-faint); display:block; padding-bottom:var(--lh); }
   /* Writing is reading with a caret in it: same type, same size, same colour,
-     no box and no button. It only appears on the screen you are standing on. */
-  .write{ display:none; outline:none; }
-  .screen.current .write{ display:inline; }
+     no box and no button. La invitación no depende de que el scroll haya
+     alcanzado a marcar la pantalla: si el snap queda a medias —y en el teléfono
+     la barra de direcciones que sube y baja lo provoca— se veía el párrafo sin
+     la pluma, que se lee como si estuviera roto. Escribir solo se puede al
+     final de una historia, así que nunca hay dos a la vista. */
+  .write{ outline:none; }
   /* el rotulo se despega del punto anterior; al escribir vuelve a ser un espacio */
   .write.after:empty{ margin-left:.5em; }
   .write:empty::before{
@@ -623,7 +629,10 @@
 
   function markCurrent(){
     var ps = screens(), k = currentIndex();
-    for(var i = 0; i < ps.length; i++) ps[i].classList.toggle("current", i === k);
+    for(var i = 0; i < ps.length; i++){
+      ps[i].classList.toggle("current", i === k);
+      ps[i].classList.toggle("away", i !== k);
+    }
     paintSpine(entries()[k]);
   }
 
@@ -721,6 +730,14 @@
   window.addEventListener("resize", function(){
     if($("#reading").hidden) return;
     measure(); markCurrent();
+  });
+  /* El scroll ya marca, pero conviene rematar cuando el snap se asienta y
+     cuando el teléfono devuelve la página desde su caché de atrás. */
+  window.addEventListener("scrollend", function(){
+    if(!$("#reading").hidden) markCurrent();
+  });
+  window.addEventListener("pageshow", function(){
+    if(!$("#reading").hidden){ measure(); markCurrent(); }
   });
 
   /* Double tap backs a paragraph. There is no count anywhere: what you see is
