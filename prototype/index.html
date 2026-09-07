@@ -475,14 +475,21 @@
   }
 
   /* Reading does not stop at the end of a story: the next one follows, and the
-     road ahead is always kept longer than the reader. What chains is finite —
-     each story ends — so this is an anthology, not a feed. */
+     road ahead is always kept longer than the reader. Pero se acaba. Cada
+     historia entra una sola vez, y cuando no quedan, el scroll llega al fondo
+     y ahí termina. Un carrete que vuelve a empezar es un feed con otro nombre:
+     lo que hace de esto una antología es que se pueda terminar de leer.
+
+     El orden es al azar y no por edad ni por respaldo: mezclar es la regla
+     anti-Mateo, que las recién sembradas y las huérfanas no queden al final. */
   function extendChain(){
-    var last = state.chain[state.chain.length - 1], pool = [];
-    STORIES.forEach(function(h, i){ if(i !== last) pool.push(i); });
-    state.chain.push(pool.length ? pool[Math.floor(Math.random() * pool.length)] : last);
+    var pool = [];
+    STORIES.forEach(function(h, i){ if(state.chain.indexOf(i) < 0) pool.push(i); });
+    if(!pool.length) return false;
+    state.chain.push(pool[Math.floor(Math.random() * pool.length)]);
     /* Only the new stretch gets dice: what you already read must not change. */
     if(state.drift) rollFor(state.chain.length - 1);
+    return true;
   }
 
   /* One flat list of screens across every story in the chain. */
@@ -604,11 +611,13 @@
   function keepAhead(){
     if(extending) return;
     if(currentIndex() < screens().length - 3) return;
+    if(state.chain.length >= STORIES.length) return;   // ya no quedan historias
     extending = true;
     var y = window.scrollY;
-    extendChain();
-    render();
-    window.scrollTo(0, y);
+    if(extendChain()){
+      render();
+      window.scrollTo(0, y);
+    }
     extending = false;
   }
 
