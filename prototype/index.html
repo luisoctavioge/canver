@@ -30,7 +30,7 @@
     -webkit-font-smoothing:antialiased;
     display:flex; flex-direction:column; min-height:100vh; min-height:100dvh;
   }
-  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+  .mono{ font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
 
   main{ flex:1; display:flex; align-items:center; justify-content:center; padding:24px 24px 0; }
   .wrap{ width:100%; max-width:var(--measure); }
@@ -132,12 +132,14 @@
      la pluma, que se lee como si estuviera roto. Escribir solo se puede al
      final de una historia, así que nunca hay dos a la vista. */
   .write{ outline:none; }
-  /* el rotulo se despega del punto anterior; al escribir vuelve a ser un espacio */
-  .write.after:empty{ margin-left:.5em; }
+  /* La invitación ocupa su propio renglón, debajo del párrafo. En cuanto
+     escribes deja de estar vacía, vuelve a ser texto en línea y lo que pones
+     entra en el párrafo, que es donde va a vivir. */
+  .write:empty{ display:block; margin-top:var(--lh); }
   .write:empty::before{
-    content:"Sigue escribiendo";
+    content:"Sigue escribiendo…";
     font-family:"IBM Plex Mono", ui-monospace, monospace;
-    font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    font-size:13px; letter-spacing:.08em; text-transform:uppercase;
     color:var(--ink-faint);
   }
 
@@ -159,7 +161,7 @@
   .grp{ display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
   .bar button{
     background:none; border:0; padding:0; cursor:pointer; color:var(--ink-faint);
-    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:11px;
+    font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:13px;
     letter-spacing:.08em; text-transform:uppercase; transition:color .2s;
   }
   .bar button:hover{ color:var(--ink); }
@@ -175,8 +177,13 @@
   }
   #spine .inner{
     width:100%; max-width:var(--measure);
-    display:flex; justify-content:space-between; align-items:flex-start;
+    display:flex; justify-content:space-between; align-items:center;
   }
+  /* La historia que empieza se anuncia aquí, al lado del lomo, y no dentro del
+     texto: es de la historia entera, como el lomo y el marcador, y así el
+     primer párrafo arranca a la misma altura que un eco. */
+  #spine .lead{ display:flex; align-items:center; gap:18px; }
+  #opens{ color:var(--ink-faint); }
   #spine .bars{ display:flex; flex-direction:column; gap:5px; }
   /* Saving keeps the story, not the paragraph: it lives with the spine, which
      is the only thing on screen that belongs to the story as a whole. */
@@ -192,9 +199,7 @@
     background:var(--rule);
     transition:background-color .3s, width .3s, border-color .3s;
   }
-  #spine i.on{ background:var(--accent); width:24px; }
-  /* a paragraph nobody has written yet is an outline, not a bar */
-  #spine i.slot{ background:none; border:1px dashed var(--ink-faint); opacity:.55; }
+  #spine i.on{ background:var(--accent); width:26px; }
 
   .label{ color:var(--ink-faint); display:block; margin-bottom:12px; }
 
@@ -248,7 +253,7 @@
   </div>
 </main>
 
-<div id="spine"><div class="inner"><div class="bars"></div><button id="mark" class="mark" title="Guardar esta historia"><svg viewBox="0 0 14 18" width="14" height="18" aria-hidden="true"><path d="M1.6 1.6h10.8v14.8l-5.4-4.4-5.4 4.4z" stroke-linejoin="round"/></svg></button></div></div>
+<div id="spine"><div class="inner"><div class="lead"><span id="opens" class="mono" hidden>Nueva historia</span><div class="bars"></div></div><button id="mark" class="mark" title="Guardar esta historia"><svg viewBox="0 0 14 18" width="14" height="18" aria-hidden="true"><path d="M1.6 1.6h10.8v14.8l-5.4-4.4-5.4 4.4z" stroke-linejoin="round"/></svg></button></div></div>
 
 <div class="bar mono">
   <div class="grp">
@@ -567,10 +572,9 @@
         ? '<span class="write' + (e.node.frs.length ? " after" : "")
           + '" contenteditable="plaintext-only" data-i="' + idx + '"></span>'
         : "";
-      /* Every story that opens says so where the echo would be, the first one
-         included: there is nothing behind it to carry over. */
-      var arriba = e.parent ? echo(e.parent)
-        : (e.opens ? '<span class="mono opening">Una historia nueva</span>' : "");
+      /* Lo que se arrastra del párrafo anterior. Una historia que empieza no
+         arrastra nada: quien lo dice es el rótulo del lomo. */
+      var arriba = e.parent ? echo(e.parent) : "";
       var mio = state.liked[e.si + ":" + e.node.likeKey];
       var corazon = e.node.blank ? ""
         : '<button class="heart" data-i="' + idx + '">'
@@ -645,14 +649,17 @@
     paintSpine(entries()[k]);
   }
 
-  /* Where you are inside the story you are reading, out of its five paragraphs. */
+  /* Where you are inside the story you are reading. Se dibujan los párrafos
+     que la historia tiene, no los cinco que podría llegar a tener: recién
+     sembrada tiene uno, y cinco huecos dirían que falta mucho más de lo que
+     falta. */
   function paintSpine(e){
     var d = $("#spine .bars"), html = "";
     $("#mark").classList.toggle("on", !!(e && state.saved[e.si]));
+    $("#opens").hidden = !(e && e.opens);
     var en = e ? e.k : -1, hay = e ? e.of : 0;
-    for(var i = 0; i < PARAS; i++){
-      var c = i === en ? "on" : (i < hay ? "" : "slot");
-      html += '<i class="' + c + '"></i>';
+    for(var i = 0; i < hay; i++){
+      html += '<i class="' + (i === en ? "on" : "") + '"></i>';
     }
     d.innerHTML = html;
   }
@@ -1026,8 +1033,11 @@
     avisar.t = setTimeout(function(){ d.classList.remove("on"); }, 3800);
   }
 
+  /* La barra dice el ritmo, no la cuenta: contar turnos es contar, y aquí no
+     se cuenta nada. Cuando no queda ninguno sí hay que decirlo, porque la
+     invitación a escribir desaparece y sin explicación se lee como una avería. */
   function updateTurns(){
-    $("#turns").textContent = state.turns + (state.turns === 1 ? " turno" : " turnos");
+    $("#turns").textContent = state.turns > 0 ? "1 turno por día" : "Vuelve mañana";
   }
 
   /* Nada que leer hasta que llegue de la base. */
