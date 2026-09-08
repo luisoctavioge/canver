@@ -167,7 +167,7 @@
   .bar button.on{ color:var(--accent); }
   .bar button:focus-visible, .item:focus-visible, .leafrow:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; }
 
-  /* Five stacked rules above the text: which of the story's five paragraphs you
+  /* Stacked rules above the text: which of the story's three paragraphs you
      are standing on. One fixed indicator, not one repeated per screen. */
   #spine{
     position:fixed; top:0; left:0; right:0; z-index:6;
@@ -360,19 +360,19 @@
      paragraph short — how a fork opens is still to be designed. */
   var LINES = 5;
 
-  /* A story is five paragraphs at most. With five hands per paragraph that is
-     also a headcount: twenty-five different people, and then it ends. The
-     vertical axis is finite on purpose; only the horizontal one is open-ended.
-     The rules above the text follow this number. */
-  var PARAS = 5;
+  /* A story is three paragraphs at most. With five hands per paragraph that is
+     also a headcount: fifteen different people, and then it ends. The vertical
+     axis is finite on purpose; only the horizontal one is open-ended. The rules
+     above the text follow this number. */
+  var PARAS = 3;
 
   /* Paso 2: se lee de la base, todavía no se escribe en ella. Escribir vuelve
      en el paso 3, con una función que gaste el turno de forma atómica. */
   var ESCRITURA = true;
 
-  /* Cinco versiones por momento. Mientras quede sitio hay una vacía al final;
-     cuando están las cinco, ya no. El eje horizontal deja de ser infinito. */
-  var VERSIONS = 5;
+  /* Tres versiones por momento. Mientras quede sitio hay una vacía al final;
+     cuando están las tres, ya no. El eje horizontal deja de ser infinito. */
+  var VERSIONS = 3;
 
   /* El árbol se arma desde los fragmentos, que es como vive en la base: cada
      uno con su padre. Un párrafo son cinco fragmentos seguidos por un mismo
@@ -681,8 +681,8 @@
   }
 
   /* Where you are inside the story you are reading. Se dibujan los párrafos
-     que la historia tiene, no los cinco que podría llegar a tener: recién
-     sembrada tiene uno, y cinco huecos dirían que falta mucho más de lo que
+     que la historia tiene, no los tres que podría llegar a tener: recién
+     sembrada tiene uno, y tres huecos dirían que falta mucho más de lo que
      falta. */
   function paintSpine(e){
     var d = $("#spine .bars"), html = "";
@@ -924,7 +924,7 @@
 
   /* La línea cuelga del último fragmento del párrafo que estabas leyendo: si es
      una versión vacía, del que la abre; si no, del último que tenga. La base
-     decide si cabe —turnos, cinco manos, cinco párrafos— y contesta. */
+     decide si cabe —turnos, cinco manos, tres párrafos— y contesta. */
   function writeInto(e, t){
     if(!e) return;
     var padre = e.node.blank ? e.node.host.ultimo

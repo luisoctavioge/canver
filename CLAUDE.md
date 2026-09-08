@@ -37,7 +37,7 @@ If any of these breaks, it stops being Canver and turns into one more social net
 | Canon | **Likes on the paragraph** | At every fork the most backed version goes first. Ties → the older one. It is recalculated, so the default reading changes as people back things. *(Was subtree weight until 05-sep-2026. Since 06-sep-2026 there is no way to give a like, so in practice the canon is the older version.)* |
 | Resolving a fork | **Canon, by hand, or by chance** | A single primitive. Canon by default, the horizontal axis by hand, Drift with the die. |
 | Unit | **Text, ~100 characters** | A fragment, also called a line. Short ones weave paragraphs; long ones read as separate voices and fall back into the shape of a list. |
-| Story | **Five paragraphs** | Twenty-five lines by twenty-five different people, and it ends. The vertical axis is finite; the horizontal one is not. *(Provisional.)* |
+| Story | **Three paragraphs** | Fifteen lines by fifteen different people, and it ends. Three versions per moment, so the horizontal axis is finite too. *(08-sep-2026. It was five and five; twenty-five different hands is a story nobody gets to finish, and five half-written versions of one moment scatter the hands that would have carried it forward.)* |
 | Paragraph | **Five lines, five hands** | Exactly five, never fewer once closed, and nobody twice in the same one. The count decides the break, not the writer. |
 | Media | **Text only in the MVP** | Image, audio, code and video come later. |
 | Typography | **IBM Plex Sans** (reading) + **IBM Plex Mono** (apparatus) | One superfamily, two roles. 18px on a 32px grid. |
@@ -78,6 +78,8 @@ db/04-turns.sql         a turn a day, claimed on arrival, no scheduler
 db/05-fix-write.sql     a fix that never ran; superseded by the 06
 db/06-una-sola-linea.sql  prunes the corpus back to the seed, and fixes write_line
 db/07-dos-turnos-y-lo-nuevo.sql  two turns a day, and what arrived since your last visit
+db/08-la-gente.sql      the eleven people of the first test
+db/09-tres-y-tres.sql   three paragraphs a story, three versions a moment
 DIAGRAM 1.png           the reading model as it stands
 DIAGRAM 2.png           stories chained in one stream, still to be designed
 ```
@@ -86,7 +88,7 @@ DIAGRAM 2.png           stories chained in one stream, still to be designed
 
 **The corpus starts at one line.** *(06-sep-2026.)* Five stories, one sentence each, nothing continued. Reading something already finished gives you nothing to continue, and continuing is the only thing the test measures — so what the test starts from is five seeds and five turns' worth of appetite. The five sentences were already written, by their own hands, in the sample fiction; choosing which of them open rather than continue was the only editing done, and rule 8 stands.
 
-**Still to run:** `db/06-una-sola-linea.sql`, by hand in the SQL editor. It is a one-time script and deliberately not a migration: it deletes every fragment that hangs off a seed, which is exactly the wrong thing to replay once people have written.
+**Everything through `db/09` is applied.** The scripts are no longer pasted into the SQL editor by hand: they run against the project through Supabase's management API, which connects as `postgres` and therefore goes straight over the row policies. So the rule that protects the corpus can no longer be the schema, it has to be the habit — **migrations get applied; one-time destructive scripts stay by hand.** `db/06-una-sola-linea.sql` is the one that must never be replayed: it deletes every fragment hanging off a seed, which is why it was deliberately not written as a migration.
 
 **What that test measures:**
 
@@ -105,7 +107,6 @@ DIAGRAM 2.png           stories chained in one stream, still to be designed
 - Does **reading depth** —how far people got before abandoning a branch— come in as a canon signal alongside fecundity? It would amend rule 4, but it pushes in the same direction, unlike the like. Deferred until the rest is running.
 - Is authorship revealed at the end of the reading, or only under authorship mode?
 - Is there a profile? Does it show fragments or fecundity?
-- **How many paragraphs at most can a story have?** Pending, and load-bearing: it is what makes a story finite, and a finite story is what keeps an endless scroll from being a feed.
 - Could the character limit be a property of the seed (100 / 280), the way someone picks a poetic form?
 - Alternate branches read in grey so you know you are off canon. It bends the "zero chrome" rule a little: does it stay or go?
 - The prototype's branches die after 3 or 4 fragments, so the horizontal axis always lands on an abrupt ending. Branches that keep going still need to be written, to find out whether the detour feels like discovery or like punishment.

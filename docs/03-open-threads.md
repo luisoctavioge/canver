@@ -37,19 +37,20 @@ It is a different act from what exists now. Today a version is an alternative to
 
 ## 4. Numbers that are provisional, not settled
 
-- **Five paragraphs per story.** Tried at four first; put back to five so more of the sample story stays reachable. Still provisional, and 3 (15 people) is the other candidate.
-- **No cap on versions per paragraph.** The horizontal axis is open-ended on purpose; if it turns out to sprawl, the cap that was floated was 3.
+- **Five lines per paragraph.** Held at five on 08-sep-2026 while the story dropped to three paragraphs and the moment to three versions. What was too long was the road to the end, not the text on the screen — but five is the number that decides how much a reader takes in at once, so it is the next one to watch.
+- **Two turns a day, five saved.** Loosened twice already, both times towards more participation. The ratchet has only turned one way, which is the direction to watch.
+
 
 ---
 
 ## 5. The sample fiction no longer fits the rules
 
-The train story was written as one continuous piece of 51 lines. Under the five-paragraph cap only its first 25 lines are reachable: **26 lines and two of its five forks are still unreadable.**
+The train story was written as one continuous piece of 51 lines. Under the three-paragraph cap only its first 15 lines are reachable: **36 lines and at least two of its five forks are still unreadable.** The fork count is the one from the old cap and wants a recount — the text it counted no longer lives in the corpus, which was pruned back to seeds on 06-sep-2026.
 
 Three ways out, all of them authorial:
 
-1. Split it into stories of five paragraphs or fewer. Boundaries at lines 25, 35 and 45 keep every fork alive, but each seam becomes an ending that was not written as one.
-2. Trim it to twenty-five lines and let the rest go.
+1. Split it into stories of three paragraphs or fewer. The old boundaries — 25, 35 and 45 — kept every fork alive; at fifteen lines a story they have to be redrawn, and each seam becomes an ending that was not written as one.
+2. Trim it to fifteen lines and let the rest go.
 3. Rewrite the tail as separate stories that stand on their own.
 
 Not a decision code can take — rule 8.
