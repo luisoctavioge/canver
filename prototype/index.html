@@ -200,6 +200,33 @@
   }
   #spine i.on{ background:var(--accent); width:26px; }
 
+  /* Al final de una historia, abajo, la que sigue. El lomo anuncia la que
+     empieza cuando ya llegaste; esto dice que hay otra antes de llegar, porque
+     un scroll que nadie sospecha no existe. Solo en el último párrafo y solo si
+     queda alguna: cuando se acaban, no promete nada. */
+  #next{
+    position:fixed; left:0; right:0; z-index:4;
+    bottom:calc(var(--bar, 64px) - 6px);
+    display:flex; justify-content:center; padding:18px 24px 8px;
+    background:linear-gradient(to bottom, rgba(250,248,243,0), var(--paper) 45%);
+    opacity:0; pointer-events:none; transition:opacity .4s ease;
+  }
+  #next.on{ opacity:1; }
+  #next button{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    background:none; border:0; padding:0; cursor:pointer;
+    color:var(--ink-faint); pointer-events:auto;
+  }
+  #next.on button:hover{ color:var(--accent); }
+  #next:not(.on) button{ pointer-events:none; }
+  #next svg{ animation:bob 1.8s ease-in-out infinite; }
+  #next svg path{ fill:none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+  #hand.open ~ #next{ opacity:0; }
+  @keyframes bob{
+    0%, 100%{ transform:translateY(0); }
+    50%{ transform:translateY(5px); }
+  }
+
   .label{ color:var(--ink-faint); display:block; margin-bottom:12px; }
 
   /* ---------- turn ---------- */
@@ -271,6 +298,8 @@
   <span class="mono label" id="handData"></span>
   <button id="handProfile" class="mono">Ver perfil</button>
 </div></div>
+
+<div id="next"><button class="mono"><span>Siguiente historia</span><svg viewBox="0 0 14 8" width="14" height="8" aria-hidden="true"><path d="M1 1l6 6 6-6"/></svg></button></div>
 
 <script>
 (function(){
@@ -509,6 +538,7 @@
   /* One flat list of screens across every story in the chain. */
   function entries(){
     var out = [];
+    if(!STORIES.length) return out;            // la base todavía no contesta
     state.chain.forEach(function(si, s){
       var route = routeOf(si, s);
       route.forEach(function(n, k){
@@ -659,6 +689,7 @@
 
   function measure(){
     root.style.setProperty("--reserved", ($(".bar").offsetHeight + 24) + "px");
+    root.style.setProperty("--bar", $(".bar").offsetHeight + "px");
   }
 
   function currentIndex(){
@@ -688,6 +719,8 @@
     var d = $("#spine .bars"), html = "";
     $("#mark").classList.toggle("on", !!(e && state.saved[e.si]));
     $("#opens").hidden = !(e && e.opens);
+    var queda = e && (e.pos < state.chain.length - 1 || state.chain.length < STORIES.length);
+    $("#next").classList.toggle("on", !!(queda && e.k === e.of - 1));
     var en = e ? e.k : -1, hay = e ? e.of : 0;
     for(var i = 0; i < hay; i++){
       html += '<i class="' + (i === en ? "on" : "") + '"></i>';
@@ -701,6 +734,23 @@
     window.scrollTo(0, window.scrollY + ps[k].getBoundingClientRect().top);
     markCurrent();
   }
+
+  /* Tocar la señal hace lo mismo que el scroll: lleva al primer párrafo de la
+     historia que sigue, y si todavía no está puesta en el camino, la pone. */
+  $("#next button").addEventListener("click", function(){
+    var e = entries()[currentIndex()];
+    if(!e) return;
+    if(e.pos === state.chain.length - 1){
+      var y = window.scrollY;
+      if(!extendChain()) return;
+      render();
+      window.scrollTo(0, y);
+    }
+    var list = entries();
+    for(var i = 0; i < list.length; i++){
+      if(list[i].pos === e.pos + 1){ goToScreen(i); return; }
+    }
+  });
 
   /* The horizontal axis resolves the fork by hand: it switches sibling, and with
      it everything hanging below. The vertical axis moves through story time.
@@ -849,7 +899,7 @@
     $("#reading").hidden = m !== "read";
     $("#index").hidden  = m !== "index";
     $("#turn").hidden   = m !== "turn";
-    ["#bAuthorship","#spine"].forEach(function(s){
+    ["#bAuthorship","#spine","#next"].forEach(function(s){
       $(s).style.visibility = m === "read" ? "visible" : "hidden";
     });
     root.classList.toggle("snap", m === "read");
