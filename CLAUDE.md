@@ -81,6 +81,7 @@ db/07-dos-turnos-y-lo-nuevo.sql  two turns a day, and what arrived since your la
 db/08-la-gente.sql      the eleven people of the first test
 db/09-tres-y-tres.sql   three paragraphs a story, three versions a moment
 db/10-aurelio.sql       one more person for the first test
+db/11-editar.sql        correct your own line, until someone continues it
 DIAGRAM 1.png           the reading model as it stands
 DIAGRAM 2.png           stories chained in one stream, still to be designed
 ```
@@ -89,7 +90,7 @@ DIAGRAM 2.png           stories chained in one stream, still to be designed
 
 **The corpus starts at one line.** *(06-sep-2026.)* Five stories, one sentence each, nothing continued. Reading something already finished gives you nothing to continue, and continuing is the only thing the test measures — so what the test starts from is five seeds and five turns' worth of appetite. The five sentences were already written, by their own hands, in the sample fiction; choosing which of them open rather than continue was the only editing done, and rule 8 stands.
 
-**Everything through `db/10` is applied.** The scripts are no longer pasted into the SQL editor by hand: they run against the project through Supabase's management API, which connects as `postgres` and therefore goes straight over the row policies. So the rule that protects the corpus can no longer be the schema, it has to be the habit — **migrations get applied; one-time destructive scripts stay by hand.** `db/06-una-sola-linea.sql` is the one that must never be replayed: it deletes every fragment hanging off a seed, which is why it was deliberately not written as a migration.
+**Everything through `db/11` is applied.** The scripts are no longer pasted into the SQL editor by hand: they run against the project through Supabase's management API, which connects as `postgres` and therefore goes straight over the row policies. So the rule that protects the corpus can no longer be the schema, it has to be the habit — **migrations get applied; one-time destructive scripts stay by hand.** `db/06-una-sola-linea.sql` is the one that must never be replayed: it deletes every fragment hanging off a seed, which is why it was deliberately not written as a migration.
 
 **What that test measures:**
 

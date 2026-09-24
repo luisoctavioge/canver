@@ -78,6 +78,15 @@
      Se apaga sola cuando te quedas en esa pantalla, porque leerla es
      exactamente lo que la deja de hacer nueva. */
   .f.nuevo{ background-color:var(--fresh); }
+  /* Tu línea, mientras nadie la haya continuado, se puede corregir: se toca y
+     se escribe encima. El subrayado punteado solo lo ves tú, y solo en lo
+     tuyo que sigue suelto; no dice de quién es nada que no sepas ya. */
+  .f.mia{
+    cursor:text; text-decoration:underline dotted var(--ink-faint);
+    text-decoration-thickness:1px; text-underline-offset:7px;
+  }
+  .f.editando{ background-color:var(--fresh); text-decoration:none; outline:none; }
+  #flow.authorship .f.mia{ cursor:pointer; text-decoration:none; }
   #flow.authorship .f{ background-color:var(--tint); }
   /* in authorship mode the picked fragment deepens and names its hand below */
   #flow.authorship .f.picked{ background-color:var(--tint2); }
@@ -417,7 +426,8 @@
     function parrafo(primero){
       var frs = [], f = primero;
       while(f && frs.length < LINES){
-        frs.push({ a:f.author_id, t:f.text, id:f.id, at:Date.parse(f.created_at) });
+        frs.push({ a:f.author_id, t:f.text, id:f.id, at:Date.parse(f.created_at),
+                   suelta: !(porPadre[f.id] || []).length });
         if(frs.length === LINES) break;
         f = (porPadre[f.id] || [])[0];      // dentro de un párrafo no se bifurca
       }
@@ -584,6 +594,7 @@
         + '<span class="f' + (!echo && fr.id && fr.id === state.fresh ? " fresh" : "")
         + (!echo && esNuevo(fr) ? " nuevo" : "")
         + (parked.indexOf(fr) >= 0 ? " dup" : "")
+        + (!echo && fr.a === YO && fr.suelta ? " mia" : "")
         + '" data-a="' + fr.a + '" data-id="' + (fr.id || "") + '"'
         + ' style="--tint:hsla(' + tt + ',55%,.13);--tint2:hsla(' + tt + ',55%,.34)">'
         + fr.t + "</span>";
@@ -874,7 +885,11 @@
   $("#handProfile").addEventListener("click", function(e){ e.stopPropagation(); });
 
   flow.addEventListener("click", function(e){
-    if(!state.authorship) return;
+    if(!state.authorship){
+      var mia = e.target.closest(".f.mia");
+      if(mia && !mia.isContentEditable) corregir(mia);
+      return;
+    }
     var el = e.target.closest(".f");
     sign(el && flow.contains(el) ? el : null);
   });
@@ -999,6 +1014,63 @@
         }
       })
       .catch(function(err){ avisar(err.message); });
+  }
+
+  /* Corregir es escribir encima, en el mismo sitio y con la misma letra: Enter
+     guarda, Escape o tocar fuera lo deja como estaba. No gasta turno. La base
+     vuelve a mirar que sea tuya y que nadie la haya continuado mientras tanto. */
+  function corregir(el){
+    var antes = el.textContent, guardando = false;
+    el.contentEditable = "plaintext-only";
+    el.classList.add("editando");
+    el.focus();
+    var r = document.createRange(), sel = window.getSelection();
+    r.selectNodeContents(el); r.collapse(false);
+    sel.removeAllRanges(); sel.addRange(r);
+
+    function soltar(){
+      el.removeEventListener("keydown", tecla);
+      el.removeEventListener("input", tope);
+      el.removeEventListener("blur", deshacer);
+      el.removeAttribute("contenteditable");
+      el.classList.remove("editando");
+    }
+    function deshacer(){ if(guardando) return; el.textContent = antes; soltar(); }
+    function tope(){
+      if(el.textContent.length <= 100) return;
+      el.textContent = el.textContent.slice(0, 100);
+      var r2 = document.createRange();
+      r2.selectNodeContents(el); r2.collapse(false);
+      sel.removeAllRanges(); sel.addRange(r2);
+    }
+    function tecla(ev){
+      if(ev.key === "Escape"){ ev.preventDefault(); el.blur(); return; }
+      if(ev.key !== "Enter") return;
+      ev.preventDefault();
+      var t = el.textContent.trim();
+      if(!t || t === antes){ el.blur(); return; }
+      guardando = true;
+      mandar("POST", "/rpc/edit_line", { p_person: YO, p_id: el.dataset.id, p_text: t })
+        .then(function(res){
+          var f = res && res.length ? res[0] : res;
+          STORIES.forEach(function(h){
+            h.frags.forEach(function(x){ if(x.id === f.id) { x.text = f.text; h.tree = null; } });
+          });
+          var k = currentIndex();
+          soltar();
+          render();
+          goToScreen(k);
+        })
+        .catch(function(err){
+          guardando = false;
+          el.textContent = antes;
+          soltar();
+          avisar(err.message);
+        });
+    }
+    el.addEventListener("keydown", tecla);
+    el.addEventListener("input", tope);
+    el.addEventListener("blur", deshacer);
   }
 
   $("#send").addEventListener("click", function(){
