@@ -151,6 +151,14 @@
     color:var(--ink-faint);
   }
 
+  /* La hoja en blanco del final: lo mismo que continuar, sin nada arriba. */
+  .semilla .write:empty{ margin-top:0; }
+  .semilla .write:empty::before{ content:"Empieza una historia…"; }
+  /* Cuántos caracteres llevas, debajo de lo que escribes y solo mientras
+     escribes. Cuando se llena, cambia de color: ya no entra más. */
+  #cuenta{ position:absolute; z-index:3; color:var(--ink-faint); pointer-events:none; }
+  #cuenta.lleno{ color:#b4553f; }
+
   /* ---------- index ---------- */
   .item{ border-top:1px solid var(--rule); padding:22px 0; cursor:pointer; }
   .item:last-child{ border-bottom:1px solid var(--rule); }
@@ -281,7 +289,7 @@
       <div id="leaves"></div>
       <div id="editor">
         <textarea id="text" maxlength="140" placeholder="Continúa…"></textarea>
-        <div class="counter mono"><span id="count">0 / 100</span><button id="send" disabled>Publicar</button></div>
+        <div class="counter mono"><span id="count">0 / 140</span><button id="send" disabled>Publicar</button></div>
       </div>
     </section>
 
@@ -307,6 +315,8 @@
   <span class="mono label" id="handData"></span>
   <button id="handProfile" class="mono">Ver perfil</button>
 </div></div>
+
+<span id="cuenta" class="mono" hidden></span>
 
 <div id="next"><button class="mono"><span>Siguiente historia</span><svg viewBox="0 0 14 8" width="14" height="8" aria-hidden="true"><path d="M1 1l6 6 6-6"/></svg></button></div>
 
@@ -397,6 +407,10 @@
      is room, and opens a new one when it is full. A fork no longer cuts a
      paragraph short — how a fork opens is still to be designed. */
   var LINES = 5;
+
+  /* Una línea son 140 caracteres como mucho: una imagen y su giro. La base
+     tiene el mismo tope, así que este solo evita escribir de más. */
+  var LARGO = 140;
 
   /* A story is three paragraphs at most. With five hands per paragraph that is
      also a headcount: fifteen different people, and then it ends. The vertical
@@ -659,6 +673,13 @@
         + (e.node.blank ? "<p>" + pluma + "</p>" : paraHTML(e.node, false, pluma))
         + "</div></div>";
     });
+    /* Cuando ya no queda ninguna, el scroll no se acaba en seco: la última
+       pantalla está en blanco y es la invitación a empezar otra. */
+    if(semilla()){
+      html += '<div class="screen semilla"><div class="col"><div class="head"></div>'
+        + '<p><span class="write nueva" contenteditable="plaintext-only"></span></p>'
+        + "</div></div>";
+    }
     flow.innerHTML = html;
     if(typeof hand !== "undefined") hand.classList.remove("open");
     /* You reached the end, so you can carry it on: the turn opens on that story. */
@@ -668,19 +689,44 @@
         ev.preventDefault();
         var t = w.textContent.trim();
         if(!t) return;
-        writeInto(entries()[parseInt(w.dataset.i, 10)], t.slice(0, 100));
+        if(w.classList.contains("nueva")) sembrar(t.slice(0, LARGO));
+        else writeInto(entries()[parseInt(w.dataset.i, 10)], t.slice(0, LARGO));
       });
       w.addEventListener("input", function(){
-        if(w.textContent.length <= 100) return;
-        w.textContent = w.textContent.slice(0, 100);
-        var r = document.createRange(), sel = window.getSelection();
-        r.selectNodeContents(w); r.collapse(false);
-        sel.removeAllRanges(); sel.addRange(r);
+        if(w.textContent.length > LARGO){
+          w.textContent = w.textContent.slice(0, LARGO);
+          var r = document.createRange(), sel = window.getSelection();
+          r.selectNodeContents(w); r.collapse(false);
+          sel.removeAllRanges(); sel.addRange(r);
+        }
+        contar(w);
       });
+      w.addEventListener("focus", function(){ contar(w); });
+      w.addEventListener("blur", callar);
     });
     measure();
     markCurrent();
   }
+
+  /* Hay pantalla para empezar una historia cuando ya se leyeron todas y te
+     queda un turno. Empezar cuesta lo mismo que continuar. */
+  function semilla(){
+    return ESCRITURA && state.turns > 0 && STORIES.length > 0
+      && state.chain.length >= STORIES.length;
+  }
+
+  /* Mientras escribes, debajo del párrafo, cuántos caracteres llevas de los
+     que caben. Solo mientras escribes: leer sigue sin contar nada. */
+  var contador = $("#cuenta");
+  function contar(el){
+    var n = el.textContent.length, r = (el.closest("p") || el).getBoundingClientRect();
+    contador.textContent = n + " / " + LARGO;
+    contador.classList.toggle("lleno", n >= LARGO);
+    contador.style.top = (r.bottom + window.scrollY + 8) + "px";
+    contador.style.left = (r.left + window.scrollX) + "px";
+    contador.hidden = false;
+  }
+  function callar(){ contador.hidden = true; }
 
   var extending = false;
   function keepAhead(){
@@ -729,9 +775,12 @@
   function paintSpine(e){
     var d = $("#spine .bars"), html = "";
     $("#mark").classList.toggle("on", !!(e && state.saved[e.si]));
+    $("#mark").hidden = !e;                  // la hoja en blanco no tiene nada que guardar
     $("#opens").hidden = !(e && e.opens);
     var queda = e && (e.pos < state.chain.length - 1 || state.chain.length < STORIES.length);
-    $("#next").classList.toggle("on", !!(queda && e.k === e.of - 1));
+    var abre = e && !queda && semilla();
+    $("#next").classList.toggle("on", !!((queda || abre) && e.k === e.of - 1));
+    $("#next span").textContent = queda ? "Siguiente historia" : "Empieza una historia";
     var en = e ? e.k : -1, hay = e ? e.of : 0;
     for(var i = 0; i < hay; i++){
       html += '<i class="' + (i === en ? "on" : "") + '"></i>';
@@ -747,20 +796,21 @@
   }
 
   /* Tocar la señal hace lo mismo que el scroll: lleva al primer párrafo de la
-     historia que sigue, y si todavía no está puesta en el camino, la pone. */
+     historia que sigue, y si todavía no está puesta en el camino, la pone.
+     Después de la última, lleva a la hoja en blanco y deja el cursor ahí. */
   $("#next button").addEventListener("click", function(){
     var e = entries()[currentIndex()];
     if(!e) return;
-    if(e.pos === state.chain.length - 1){
+    if(e.pos === state.chain.length - 1 && state.chain.length < STORIES.length){
       var y = window.scrollY;
-      if(!extendChain()) return;
-      render();
-      window.scrollTo(0, y);
+      if(extendChain()){ render(); window.scrollTo(0, y); }
     }
     var list = entries();
     for(var i = 0; i < list.length; i++){
       if(list[i].pos === e.pos + 1){ goToScreen(i); return; }
     }
+    var hoja = flow.querySelector(".semilla .write");
+    if(hoja){ goToScreen(screens().length - 1); hoja.focus(); }
   });
 
   /* The horizontal axis resolves the fork by hand: it switches sibling, and with
@@ -982,9 +1032,9 @@
 
   $("#text").addEventListener("input", function(){
     var n = this.value.trim().length;
-    $("#count").textContent = n + " / 100";
-    $("#count").parentNode.classList.toggle("over", n > 100);
-    $("#send").disabled = !(n > 0 && n <= 100 && state.pickedLeaf !== null);
+    $("#count").textContent = n + " / " + LARGO;
+    $("#count").parentNode.classList.toggle("over", n > LARGO);
+    $("#send").disabled = !(n > 0 && n <= LARGO && state.pickedLeaf !== null);
   });
 
   /* La línea cuelga del último fragmento del párrafo que estabas leyendo: si es
@@ -1006,12 +1056,35 @@
         state.fresh = f.id;
         updateTurns();
         render();
-        var recien = flow.querySelector(".f.fresh");
-        if(recien){
-          var ps = screens(), suya = recien.closest(".screen");
-          for(var x = 0; x < ps.length; x++) if(ps[x] === suya) goToScreen(x);
-          setTimeout(function(){ recien.classList.remove("fresh"); state.fresh = null; }, 2400);
-        }
+        irALoRecien();
+      })
+      .catch(function(err){ avisar(err.message); });
+  }
+
+  function irALoRecien(){
+    callar();
+    var recien = flow.querySelector(".f.fresh");
+    if(!recien) return;
+    var ps = screens(), suya = recien.closest(".screen");
+    for(var x = 0; x < ps.length; x++) if(ps[x] === suya) goToScreen(x);
+    setTimeout(function(){ recien.classList.remove("fresh"); state.fresh = null; }, 2400);
+  }
+
+  /* Empezar una historia es escribir su primera línea en la hoja en blanco del
+     final. La base abre la historia y cobra el turno en el mismo paso; aquí
+     entra al camino como la siguiente, y la hoja en blanco se corre detrás. */
+  function sembrar(t){
+    mandar("POST", "/rpc/seed_story", { p_person: YO, p_text: t })
+      .then(function(nuevo){
+        var f = nuevo && nuevo.length ? nuevo[0] : nuevo;
+        STORIES.push({ id: f.story_id, frags: [f], likes: {}, tree: null });
+        state.chain.push(STORIES.length - 1);
+        hands = null;
+        state.turns = Math.max(0, state.turns - 1);
+        state.fresh = f.id;
+        updateTurns();
+        render();
+        irALoRecien();
       })
       .catch(function(err){ avisar(err.message); });
   }
@@ -1027,6 +1100,7 @@
     var r = document.createRange(), sel = window.getSelection();
     r.selectNodeContents(el); r.collapse(false);
     sel.removeAllRanges(); sel.addRange(r);
+    contar(el);
 
     function soltar(){
       el.removeEventListener("keydown", tecla);
@@ -1034,14 +1108,17 @@
       el.removeEventListener("blur", deshacer);
       el.removeAttribute("contenteditable");
       el.classList.remove("editando");
+      callar();
     }
     function deshacer(){ if(guardando) return; el.textContent = antes; soltar(); }
     function tope(){
-      if(el.textContent.length <= 100) return;
-      el.textContent = el.textContent.slice(0, 100);
-      var r2 = document.createRange();
-      r2.selectNodeContents(el); r2.collapse(false);
-      sel.removeAllRanges(); sel.addRange(r2);
+      if(el.textContent.length > LARGO){
+        el.textContent = el.textContent.slice(0, LARGO);
+        var r2 = document.createRange();
+        r2.selectNodeContents(el); r2.collapse(false);
+        sel.removeAllRanges(); sel.addRange(r2);
+      }
+      contar(el);
     }
     function tecla(ev){
       if(ev.key === "Escape"){ ev.preventDefault(); el.blur(); return; }
@@ -1088,7 +1165,7 @@
     state.drift = false;
     $("#bDrift").classList.remove("on");
     $("#text").value = "";
-    $("#count").textContent = "0 / 100";
+    $("#count").textContent = "0 / " + LARGO;
     $("#send").disabled = true;
     $("#editor").classList.remove("open");
     state.pickedLeaf = null;
