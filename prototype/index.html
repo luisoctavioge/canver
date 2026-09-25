@@ -426,6 +426,12 @@
      cuando están las tres, ya no. El eje horizontal deja de ser infinito. */
   var VERSIONS = 3;
 
+  /* El eje horizontal está apagado, no borrado. La prueba mira primero si una
+     historia lineal se sostiene: una sola línea de tiempo, de arriba abajo.
+     Con esto en false no hay puntos de versiones ni gesto lateral, y a cada
+     momento se le sigue por el canon. Encenderlo devuelve todo como estaba. */
+  var HORIZONTAL = false;
+
   /* El árbol se arma desde los fragmentos, que es como vive en la base: cada
      uno con su padre. Un párrafo son cinco fragmentos seguidos por un mismo
      camino, y los hijos del quinto son las versiones del párrafo siguiente —
@@ -636,7 +642,7 @@
       var hueco = hermanos.length > 0 && hermanos.length < VERSIONS;
       var cual = e.node.blank ? hermanos.length : hermanos.indexOf(e.node);
       var puntos = "";
-      if(hermanos.length > 1 || hueco){
+      if(HORIZONTAL && (hermanos.length > 1 || hueco)){
         for(var d = 0; d < hermanos.length + (hueco ? 1 : 0); d++){
           puntos += '<i class="' + (d === hermanos.length ? "slot " : "")
             + (d === cual ? "on" : "") + '"></i>';
@@ -823,6 +829,7 @@
      lado y se regresa hacia el otro. Los puntos ya dicen dónde estás, así que
      los topes se ven; con la vuelta puesta uno no sabía si iba o volvía. */
   function otherVersion(dir){
+    if(!HORIZONTAL) return;
     var list = entries(), k = currentIndex(), e = list[k];
     if(!e || !e.parent) return;
     var kids = e.parent.kids;
